@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ashta Chemma - అష్టా చమ్మా</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .setup-screen, .game-screen { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .setup-screen { max-width: 600px; margin: 50px auto; }
+        h1 { text-align: center; color: #333; margin-bottom: 10px; font-size: 2.5em; }
+        .telugu-title { text-align: center; color: #667eea; font-size: 1.5em; margin-bottom: 30px; font-weight: bold; }
+        .form-group { margin-bottom: 25px; }
+        .form-group label { display: block; margin-bottom: 10px; color: #333; font-weight: bold; }
+        .form-group input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; }
+        .team-setup { margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px; }
+        .team-item { margin-bottom: 15px; padding: 15px; background: white; border-radius: 8px; }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; padding: 15px 30px; border: none; border-radius: 8px;
+            font-size: 18px; cursor: pointer; width: 100%; margin-top: 20px; font-weight: bold;
+        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .game-screen { display: none; }
+        .game-layout { display: grid; grid-template-columns: 1fr 600px 1fr; gap: 30px; margin-top: 20px; }
+        
+        /* Mobile-first responsive design */
+        @media (max-width: 1200px) {
+            .game-layout { 
+                grid-template-columns: 1fr; 
+                gap: 15px; 
+                max-width: 100%;
+                padding: 10px;
+            }
+            .control-panel { order: 1; }
+            .board-container { order: 2; }
+            .control-panel:last-child { order: 3; }
+            
+            .board { 
+                grid-template-columns: repeat(5, 70px); 
+                grid-template-rows: repeat(5, 70px); 
+                margin: 0 auto;
+            }
+            .cell.safe::before { font-size: 45px; }
+            .piece { width: 16px; height: 16px; font-size: 7px; }
+            .piece.parent { width: 20px; height: 20px; font-size: 8px; }
+        }
+        
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            h1 { font-size: 1.8em; }
+            .telugu-title { font-size: 1.2em; }
+            
+            .board { 
+                grid-template-columns: repeat(5, 60px); 
+                grid-template-rows: repeat(5, 60px); 
+            }
+            .cell.safe::before { font-size: 35px; }
+            .piece { width: 14px; height: 14px; font-size: 6px; }
+            .piece.parent { width: 17px; height: 17px; font-size: 7px; }
+            
+            .seeds { width: 160px; height: 160px; }
+            .seed { width: 32px; height: 42px; }
+            
+            .current-turn h2 { font-size: 1.2em; }
+            .dice-result { font-size: 20px; }
+            
+            button { padding: 12px 20px; font-size: 16px; }
+        }
+        
+        @media (max-width: 480px) {
+            .board { 
+                grid-template-columns: repeat(5, 50px); 
+                grid-template-rows: repeat(5, 50px); 
+            }
+            .cell.safe::before { font-size: 28px; }
+            .piece { width: 12px; height: 12px; font-size: 5px; }
+            .piece.parent { width: 15px; height: 15px; font-size: 6px; }
+            
+            .seeds { width: 140px; height: 140px; }
+            .seed { width: 28px; height: 38px; }
+        }
+        
+        /* Collapsible sections */
+        .collapsible-section { 
+            background: white; 
+            border-radius: 10px; 
+            margin-bottom: 10px; 
+            overflow: hidden;
+        }
+        .collapsible-header { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            padding: 12px 15px; 
+            cursor: pointer; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            font-weight: bold;
+            user-select: none;
+        }
+        .collapsible-header:hover { opacity: 0.9; }
+        .collapsible-header .toggle-icon { 
+            font-size: 20px; 
+            transition: transform 0.3s; 
+        }
+        .collapsible-header.collapsed .toggle-icon { transform: rotate(-90deg); }
+        .collapsible-content { 
+            padding: 15px; 
+            display: block;
+        }
+        .collapsible-content.hidden { display: none; }
+        
+        /* Dead pieces display - always visible */
+        .dead-pieces-section { 
+            background: #fff3cd; 
+            border: 2px solid #ffc107; 
+            border-radius: 10px; 
+            padding: 15px; 
+            margin-bottom: 15px;
+        }
+        .dead-pieces-section h3 { 
+            margin: 0 0 10px 0; 
+            color: #856404; 
+            font-size: 16px;
+        }
+        .dead-piece-item { 
+            display: inline-block; 
+            padding: 8px 12px; 
+            margin: 5px; 
+            border-radius: 5px; 
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .dead-piece-item.revivable { 
+            background: #90EE90; 
+            cursor: pointer; 
+            animation: pulse 1s infinite;
+            border: 2px solid #4CAF50;
+        }
+        .dead-piece-item.not-revivable { 
+            background: #ffcccc; 
+            border: 2px solid #999;
+            opacity: 0.7;
+        }
+        .board-container { display: flex; justify-content: center; align-items: center; }
+        .board {
+            display: grid; grid-template-columns: repeat(5, 100px); grid-template-rows: repeat(5, 100px);
+            gap: 2px; background: #333; padding: 2px; border: 4px solid #333; border-radius: 10px;
+        }
+        .cell { background: white; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; }
+        .cell.safe { background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%); }
+        .cell.safe::before { content: 'X'; position: absolute; font-size: 60px; color: rgba(255, 255, 255, 0.3); font-weight: bold; pointer-events: none; }
+        .cell.win { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .cell.valid-dest { box-shadow: inset 0 0 0 4px #2196F3; animation: blink 1s infinite; cursor: pointer; }
+        .cell.valid-dest:hover { background: rgba(33, 150, 243, 0.3); }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        .piece {
+            width: 22px; height: 22px; border-radius: 50%; border: 2px solid white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 9px; color: white; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            cursor: pointer; z-index: 100; position: relative; pointer-events: auto;
+        }
+        .piece.parent { width: 26px; height: 26px; font-size: 10px; border-width: 3px; }
+        .piece.selectable { border-color: #4CAF50; box-shadow: 0 0 10px #4CAF50; }
+        .piece.selectable:hover { transform: scale(1.2); border-width: 3px; }
+        .team-color-0 { background: #e74c3c; }
+        .team-color-1 { background: #3498db; }
+        .team-color-2 { background: #2ecc71; }
+        .team-color-3 { background: #f39c12; }
+        .control-panel { background: #f8f9fa; padding: 20px; border-radius: 10px; }
+        .current-turn { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; text-align: center; }
+        .current-turn h2 { color: #333; margin-bottom: 10px; }
+        .dice-container { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        .seeds { 
+            position: relative;
+            width: 200px; 
+            height: 200px; 
+            margin: 20px auto;
+            background: radial-gradient(circle, #8b7355 0%, #6b5644 100%);
+            border-radius: 50%;
+            box-shadow: inset 0 3px 10px rgba(0,0,0,0.4), 0 3px 15px rgba(0,0,0,0.3);
+        }
+        .seed { 
+            width: 40px; 
+            height: 50px;
+            position: absolute;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+            transition: transform 0.3s ease;
+        }
+        .seed:hover { transform: scale(1.1); }
+        .seed.white { 
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0id2hpdGVHcmFkIiBjeD0iNTAlIiBjeT0iNDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6I2ZmZmZmZjtzdG9wLW9wYWNpdHk6MSIgLz4KICAgICAgPHN0b3Agb2Zmc2V0PSI1MCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNmNWY1ZTg7c3RvcC1vcGFjaXR5OjEiIC8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6I2UwZTBkMDtzdG9wLW9wYWNpdHk6MSIgLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9InNoaW5lIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6I2ZmZmZmZjtzdG9wLW9wYWNpdHk6MC42IiAvPgogICAgICA8c3RvcCBvZmZzZXQ9IjUwJSIgc3R5bGU9InN0b3AtY29sb3I6I2ZmZmZmZjtzdG9wLW9wYWNpdHk6MCIgLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDwhLS0gVGFtYXJpbmQgc2VlZCBzaGFwZSAtLT4KICA8ZWxsaXBzZSBjeD0iNTAiIGN5PSI2MCIgcng9IjQyIiByeT0iNTUiIGZpbGw9InVybCgjd2hpdGVHcmFkKSIgc3Ryb2tlPSIjYzBjMGIwIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8IS0tIFRleHR1cmUgbGluZXMgLS0+CiAgPGVsbGlwc2UgY3g9IjUwIiBjeT0iNDUiIHJ4PSIzMCIgcnk9IjIwIiBmaWxsPSJub25lIiBzdHJva2U9IiNlZWVlZTAiIHN0cm9rZS13aWR0aD0iMSIgb3BhY2l0eT0iMC40Ii8+CiAgPGVsbGlwc2UgY3g9IjUwIiBjeT0iNzAiIHJ4PSIzNSIgcnk9IjI1IiBmaWxsPSJub25lIiBzdHJva2U9IiNlZWVlZTAiIHN0cm9rZS13aWR0aD0iMSIgb3BhY2l0eT0iMC4zIi8+CiAgPCEtLSBTaGluZSBlZmZlY3QgLS0+CiAgPGVsbGlwc2UgY3g9IjM1IiBjeT0iNDAiIHJ4PSIyMCIgcnk9IjI1IiBmaWxsPSJ1cmwoI3NoaW5lKSIgb3BhY2l0eT0iMC4zIi8+Cjwvc3ZnPg=='); 
+        }
+        .seed.black { 
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iYnJvd25HcmFkIiBjeD0iNTAlIiBjeT0iNDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzZiNGUzZjtzdG9wLW9wYWNpdHk6MSIgLz4KICAgICAgPHN0b3Agb2Zmc2V0PSI1MCUiIHN0eWxlPSJzdG9wLWNvbG9yOiM1YTNlMmY7c3RvcC1vcGFjaXR5OjEiIC8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6IzRhMmUxZjtzdG9wLW9wYWNpdHk6MSIgLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9InNoaW5lQnJvd24iIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojOGI2ZTVmO3N0b3Atb3BhY2l0eTowLjQiIC8+CiAgICAgIDxzdG9wIG9mZnNldD0iNTAlIiBzdHlsZT0ic3RvcC1jb2xvcjojOGI2ZTVmO3N0b3Atb3BhY2l0eTowIiAvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPCEtLSBUYW1hcmluZCBzZWVkIHNoYXBlIC0tPgogIDxlbGxpcHNlIGN4PSI1MCIgY3k9IjYwIiByeD0iNDIiIHJ5PSI1NSIgZmlsbD0idXJsKCNicm93bkdyYWQpIiBzdHJva2U9IiMzYTJlMWYiIHN0cm9rZS13aWR0aD0iMiIvPgogIDwhLS0gVGV4dHVyZSBsaW5lcyAtLT4KICA8ZWxsaXBzZSBjeD0iNTAiIGN5PSI0NSIgcng9IjMwIiByeT0iMjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzViM2UyZiIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjMiLz4KICA8ZWxsaXBzZSBjeD0iNTAiIGN5PSI3MCIgcng9IjM1IiByeT0iMjUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzViM2UyZiIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjIiLz4KICA8IS0tIFNoaW5lIGVmZmVjdCAtLT4KICA8ZWxsaXBzZSBjeD0iMzUiIGN5PSI0MCIgcng9IjIwIiByeT0iMjUiIGZpbGw9InVybCgjc2hpbmVCcm93bikiIG9wYWNpdHk9IjAuMyIvPgo8L3N2Zz4='); 
+        }
+        .dice-result { text-align: center; font-size: 24px; font-weight: bold; color: #667eea; margin: 15px 0; }
+        .turn-summary { background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 15px 0; text-align: center; font-size: 16px; font-weight: bold; color: #1976d2; border: 2px solid #1976d2; }
+        .teams-status { background: white; padding: 20px; border-radius: 10px; }
+        .team-status { margin-bottom: 15px; padding: 15px; border-radius: 8px; background: #f8f9fa; }
+        .team-status.active { border: 3px solid #4CAF50; }
+        .piece-status { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+        .piece-info { padding: 8px 12px; border-radius: 5px; background: white; font-size: 12px; cursor: pointer; }
+        .piece-info.dead { opacity: 0.5; background: #ffcccc; }
+        .piece-info.revivable { background: #90EE90; cursor: pointer; animation: pulse 1s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; }
+        .modal.show { display: flex; }
+        .modal-content { background: white; padding: 40px; border-radius: 20px; text-align: center; max-width: 500px; }
+        .win-animation { font-size: 80px; margin-bottom: 20px; }
+        .message-box { background: #fff3cd; border: 2px solid #ffc107; padding: 15px; border-radius: 8px; margin: 15px 0; color: #856404; }
+        .hidden { display: none; }
+        .pieces-on-cell { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; z-index: 50; position: relative; pointer-events: none; }
+        .roll-btn { background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); margin-bottom: 15px; }
+        .instructions { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        .instructions h3 { color: #333; margin-bottom: 10px; }
+        .instructions ul { margin-left: 20px; color: #666; line-height: 1.8; }
+        .roll-history { background: white; padding: 15px; border-radius: 10px; margin-top: 20px; max-height: 300px; overflow-y: auto; }
+        .roll-history h3 { color: #333; margin-bottom: 10px; font-size: 16px; }
+        .history-entry { padding: 8px; margin: 5px 0; border-left: 4px solid #ddd; background: #f8f9fa; border-radius: 4px; font-size: 13px; }
+        .history-entry.current-team { border-left-color: #4CAF50; background: #e8f5e9; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="setup-screen" id="setupScreen">
+            <h1>Ashta Chemma</h1>
+            <div class="telugu-title">అష్టా చమ్మా</div>
+            <div class="form-group">
+                <label for="numTeams">Number of Teams (2-4):</label>
+                <input type="number" id="numTeams" min="2" max="4" value="2">
+            </div>
+            <div class="form-group">
+                <label for="teamSize">Team Size (1-2 players):</label>
+                <input type="number" id="teamSize" min="1" max="2" value="1">
+            </div>
+            <div id="teamSetup" class="team-setup"></div>
+            <button onclick="startGame()">Start Game</button>
+        </div>
+
+        <div class="game-screen" id="gameScreen">
+            <h1>Ashta Chemma - అష్టా చమ్మా</h1>
+            
+            <!-- Dead Pieces Section - Always Visible -->
+            <div class="dead-pieces-section" id="deadPiecesSection" style="display: none;">
+                <h3>💀 Dead Pieces (Click to Revive)</h3>
+                <div id="deadPiecesDisplay"></div>
+            </div>
+            
+            <div class="game-layout">
+                <div class="control-panel">
+                    <div class="current-turn">
+                        <h2>Current Turn</h2>
+                        <div id="currentTurnInfo"></div>
+                    </div>
+                    <div class="dice-container">
+                        <h3 style="text-align: center; margin-bottom: 15px;">Roll Dice</h3>
+                        <button class="roll-btn" onclick="rollDice()" id="rollBtn">Roll Seeds</button>
+                        <div class="seeds" id="seedsDisplay"></div>
+                        <div class="dice-result" id="diceResult"></div>
+                        <div class="accumulated-rolls" id="accumulatedRolls" style="background: #e8f5e9; padding: 10px; border-radius: 8px; margin: 10px 0; font-weight: bold; color: #2e7d32; text-align: center; display: none;"></div>
+                        <div class="turn-summary hidden" id="turnSummary"></div>
+                        <div class="message-box hidden" id="messageBox"></div>
+                    </div>
+                    
+                    <!-- Collapsible Reference Guide -->
+                    <div class="collapsible-section">
+                        <div class="collapsible-header" onclick="toggleCollapse(this)">
+                            <span>Reference Guide</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="collapsible-content">
+                            <ul style="margin-left: 20px; color: #666; line-height: 1.8;">
+                                <li><strong>Asta (అష్టా):</strong> All same</li>
+                                <li><strong>Chemma (చమ్మా):</strong> 4 whites</li>
+                                <li><strong>Mudu (మూడు):</strong> 3 whites</li>
+                                <li><strong>Rendu (రెండు):</strong> 2 whites</li>
+                                <li><strong>Kinnu (కిన్ను):</strong> 1 white</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Collapsible Roll History -->
+                    <div class="collapsible-section">
+                        <div class="collapsible-header collapsed" onclick="toggleCollapse(this)">
+                            <span>Roll History</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="collapsible-content hidden">
+                            <div id="rollHistoryContent" style="max-height: 300px; overflow-y: auto;"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="board-container">
+                    <div class="board" id="gameBoard"></div>
+                </div>
+                
+                <div class="control-panel">
+                    <!-- Collapsible Teams Status -->
+                    <div class="collapsible-section">
+                        <div class="collapsible-header collapsed" onclick="toggleCollapse(this)">
+                            <span>Teams Status</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="collapsible-content hidden">
+                            <div id="teamsStatus"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="winModal">
+            <div class="modal-content">
+                <div class="win-animation">🏆</div>
+                <h2 id="winnerText"></h2>
+                <p>Congratulations!</p>
+                <button onclick="location.reload()">Play Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let gameState = {
+            teams: [], currentTeamIndex: 0, currentPlayerIndex: 0,
+            chemmasCount: 0, lastRoll: null, killedThisTurn: false,
+            moveHistory: [], initialPositions: [], selectedPieceId: null, validDestinations: [],
+            turnStartChemmas: 0, turnStartLastRoll: null, firstRollOfTurn: true,
+            killedPieces: [], // Track all pieces killed this turn for rollback
+            totalChemmasThisTurn: 0, allRollsThisTurn: [], // Track all rolls for display
+            rollHistory: [] // Complete history of all rolls across all turns
+        };
+
+        const TEAM_COLORS = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12'];
+        const TEAM_NAMES = ['Red', 'Blue', 'Green', 'Orange'];
+        const START_POSITIONS = [[4, 2], [2, 4], [0, 2], [2, 0]];
+        const PATHS = {
+            '0,2': [[0,2], [0,1], [0,0], [1,0], [2,0], [3,0], [4,0], [4,1], [4,2], [4,3], [4,4], [3,4], [2,4], [1,4], [0,4], [0,3], [1,3], [2,3], [3,3], [3,2], [3,1], [2,1], [1,1], [1,2], [2,2]],
+            '2,0': [[2,0], [3,0], [4,0], [4,1], [4,2], [4,3], [4,4], [3,4], [2,4], [1,4], [0,4], [0,3], [0,2], [0,1], [0,0], [1,0], [1,1], [1,2], [1,3], [2,3], [3,3], [3,2], [3,1], [2,1], [2,2]],
+            '4,2': [[4,2], [4,3], [4,4], [3,4], [2,4], [1,4], [0,4], [0,3], [0,2], [0,1], [0,0], [1,0], [2,0], [3,0], [4,0], [4,1], [3,1], [2,1], [1,1], [1,2], [1,3], [2,3], [3,3], [3,2], [2,2]],
+            '2,4': [[2,4], [1,4], [0,4], [0,3], [0,2], [0,1], [0,0], [1,0], [2,0], [3,0], [4,0], [4,1], [4,2], [4,3], [4,4], [3,4], [3,3], [3,2], [3,1], [2,1], [1,1], [1,2], [1,3], [2,3], [2,2]]
+        };
+
+        document.getElementById('numTeams').addEventListener('input', updateTeamSetup);
+        document.getElementById('teamSize').addEventListener('input', updateTeamSetup);
+
+        function updateTeamSetup() {
+            const numTeams = parseInt(document.getElementById('numTeams').value);
+            const teamSize = parseInt(document.getElementById('teamSize').value);
+            const teamSetup = document.getElementById('teamSetup');
+            teamSetup.innerHTML = '';
+            
+            for (let i = 0; i < numTeams; i++) {
+                let html = `<div class="team-item"><h3 style="color: ${TEAM_COLORS[i]};">Team ${i + 1} (${TEAM_NAMES[i]})</h3>`;
+                for (let p = 0; p < teamSize; p++) {
+                    html += `<input type="text" placeholder="Player ${p + 1}" id="team${i}player${p}" style="width: 100%; margin-top: 5px; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">`;
+                }
+                html += '</div>';
+                teamSetup.innerHTML += html;
+            }
+        }
+
+        updateTeamSetup();
+
+        function startGame() {
+            const numTeams = parseInt(document.getElementById('numTeams').value);
+            const teamSize = parseInt(document.getElementById('teamSize').value);
+            if (numTeams < 2 || numTeams > 4) { alert('Select 2-4 teams'); return; }
+
+            gameState.teams = [];
+            const selectedPositions = numTeams === 2 ? [0, 2] : numTeams === 3 ? [0, 1, 2] : [0, 1, 2, 3];
+
+            for (let i = 0; i < numTeams; i++) {
+                const players = [];
+                for (let p = 0; p < teamSize; p++) {
+                    const input = document.getElementById(`team${i}player${p}`);
+                    players.push({ name: input.value.trim() || `Player ${p + 1}`, pandatam: false });
+                }
+                const startPos = START_POSITIONS[selectedPositions[i]];
+                gameState.teams.push({
+                    id: i, color: TEAM_COLORS[i], name: TEAM_NAMES[i], players: players,
+                    pieces: [
+                        { id: 'P', type: 'parent', dead: false, pathIndex: 0 },
+                        { id: 'C1', type: 'child', dead: false, pathIndex: 0 },
+                        { id: 'C2', type: 'child', dead: false, pathIndex: 0 }
+                    ],
+                    path: PATHS[`${startPos[0]},${startPos[1]}`]
+                });
+            }
+
+            document.getElementById('setupScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'block';
+            initializeBoard();
+            updateGameDisplay();
+        }
+
+        function initializeBoard() {
+            const board = document.getElementById('gameBoard');
+            board.innerHTML = '';
+            for (let row = 0; row < 5; row++) {
+                for (let col = 0; col < 5; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.row = row;
+                    cell.dataset.col = col;
+                    if (row === 2 || col === 2) cell.classList.add('safe');
+                    if (row === 2 && col === 2) cell.classList.add('win');
+                    cell.addEventListener('click', () => handleCellClick(row, col));
+                    board.appendChild(cell);
+                }
+            }
+            renderPieces();
+        }
+
+        function renderPieces() {
+            document.querySelectorAll('.pieces-on-cell').forEach(el => el.remove());
+            gameState.teams.forEach(team => {
+                team.pieces.forEach(piece => {
+                    if (!piece.dead) {
+                        const [row, col] = team.path[piece.pathIndex];
+                        const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+                        let piecesDiv = cell.querySelector('.pieces-on-cell');
+                        if (!piecesDiv) {
+                            piecesDiv = document.createElement('div');
+                            piecesDiv.className = 'pieces-on-cell';
+                            cell.appendChild(piecesDiv);
+                        }
+                        const pieceEl = document.createElement('div');
+                        pieceEl.className = `piece team-color-${team.id} ${piece.type}`;
+                        pieceEl.textContent = piece.id;
+                        pieceEl.dataset.teamId = team.id;
+                        pieceEl.dataset.pieceId = piece.id;
+                        pieceEl.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            handlePieceClick(team.id, piece.id);
+                        });
+                        piecesDiv.appendChild(pieceEl);
+                    }
+                });
+            });
+        }
+
+        const ROLL_NAMES = {
+            'asta': { english: 'Asta', telugu: 'అష్టా' },
+            'chemma': { english: 'Chemma', telugu: 'చమ్మా' },
+            3: { english: 'Mudu', telugu: 'మూడు' },
+            2: { english: 'Rendu', telugu: 'రెండు' },
+            1: { english: 'Kinnu', telugu: 'కిన్ను' }
+        };
+
+        function rollDice() {
+            const seeds = [];
+            let whiteCount = 0;
+            for (let i = 0; i < 5; i++) {
+                const isWhite = Math.random() > 0.5;
+                seeds.push(isWhite);
+                if (isWhite) whiteCount++;
+            }
+
+            // Position seeds randomly in circle without overlap
+            const seedsDisplay = document.getElementById('seedsDisplay');
+            seedsDisplay.innerHTML = '';
+            const positions = generateNonOverlappingPositions(5, 200, 40, 50);
+            
+            seeds.forEach((isWhite, index) => {
+                const seed = document.createElement('div');
+                seed.className = `seed ${isWhite ? 'white' : 'black'}`;
+                seed.style.left = positions[index].x + 'px';
+                seed.style.top = positions[index].y + 'px';
+                seed.style.transform = `rotate(${Math.random() * 360}deg)`;
+                seedsDisplay.appendChild(seed);
+            });
+
+            let rollName, rollValue;
+            if (whiteCount === 5 || whiteCount === 0) { rollName = 'asta'; rollValue = 'asta'; }
+            else if (whiteCount === 4) { rollName = 'chemma'; rollValue = 'chemma'; }
+            else if (whiteCount === 3) { rollName = 3; rollValue = 3; }
+            else if (whiteCount === 2) { rollName = 2; rollValue = 2; }
+            else { rollName = 1; rollValue = 1; }
+
+            document.getElementById('diceResult').textContent = `${ROLL_NAMES[rollName].english} (${ROLL_NAMES[rollName].telugu})`;
+
+            if (rollValue === 'asta') {
+                gameState.chemmasCount += 2;
+                gameState.totalChemmasThisTurn += 2;
+            } else if (rollValue === 'chemma') {
+                gameState.chemmasCount += 1;
+                gameState.totalChemmasThisTurn += 1;
+            }
+            
+            gameState.lastRoll = { name: rollName, value: rollValue };
+            gameState.allRollsThisTurn.push({ name: rollName, value: rollValue });
+            
+            // Add to complete history
+            const team = gameState.teams[gameState.currentTeamIndex];
+            const player = team.players[gameState.currentPlayerIndex];
+            gameState.rollHistory.push({
+                teamName: team.name,
+                playerName: player.name,
+                roll: `${ROLL_NAMES[rollName].english} (${ROLL_NAMES[rollName].telugu})`,
+                timestamp: new Date().toLocaleTimeString()
+            });
+            updateRollHistory();
+            
+            // Show accumulated rolls
+            updateAccumulatedDisplay();
+
+            // Check if this roll actually enables any moves
+            if (rollValue === 'asta' || rollValue === 'chemma') {
+                if (canMakeAnyMove()) {
+                    showMessage('Extra turn! Roll again or wait.');
+                } else {
+                    // No valid moves possible, proceed to play
+                    document.getElementById('rollBtn').disabled = true;
+                    if (gameState.firstRollOfTurn) {
+                        saveInitialPositions();
+                        gameState.firstRollOfTurn = false;
+                    }
+                    showTurnSummary();
+                    setTimeout(() => processAllRolls(), 1000);
+                }
+            } else {
+                document.getElementById('rollBtn').disabled = true;
+                if (gameState.firstRollOfTurn) {
+                    saveInitialPositions();
+                    gameState.firstRollOfTurn = false;
+                }
+                showTurnSummary();
+                setTimeout(() => processAllRolls(), 1000);
+            }
+        }
+
+        function generateNonOverlappingPositions(count, circleSize, itemWidth, itemHeight) {
+            const positions = [];
+            const radius = (circleSize - Math.max(itemWidth, itemHeight)) / 2;
+            const centerX = circleSize / 2 - itemWidth / 2;
+            const centerY = circleSize / 2 - itemHeight / 2;
+            const minDistance = Math.max(itemWidth, itemHeight) * 0.7;
+            
+            for (let i = 0; i < count; i++) {
+                let attempts = 0;
+                let pos;
+                
+                do {
+                    const angle = Math.random() * Math.PI * 2;
+                    const dist = Math.random() * radius * 0.7;
+                    pos = {
+                        x: centerX + Math.cos(angle) * dist,
+                        y: centerY + Math.sin(angle) * dist
+                    };
+                    attempts++;
+                } while (attempts < 50 && positions.some(p => 
+                    Math.sqrt(Math.pow(p.x - pos.x, 2) + Math.pow(p.y - pos.y, 2)) < minDistance
+                ));
+                
+                positions.push(pos);
+            }
+            
+            return positions;
+        }
+
+        function canConsumeAllValues(team) {
+            // Check if there's any combination of moves that uses ALL accumulated values
+            const totalChemmas = gameState.chemmasCount;
+            const lastRoll = gameState.lastRoll;
+            
+            // Try to find if we can use all values
+            function tryAllCombinations(remainingChemmas, remainingLastRoll, piecesState) {
+                // Success: consumed everything
+                if (remainingChemmas === 0 && !remainingLastRoll) {
+                    return true;
+                }
+                
+                // Try each piece
+                for (let i = 0; i < piecesState.length; i++) {
+                    const piece = piecesState[i];
+                    if (piece.dead || piece.pathIndex >= team.path.length - 1) continue;
+                    
+                    // Try using different amounts of chemmas
+                    const stepsPerChemma = piece.type === 'parent' ? 2 : 4;
+                    
+                    for (let chemmasToUse = 0; chemmasToUse <= remainingChemmas; chemmasToUse++) {
+                        for (let useBase = 0; useBase <= (remainingLastRoll ? 1 : 0); useBase++) {
+                            const baseSteps = piece.type === 'parent' && remainingLastRoll && remainingLastRoll.value === 2 ? 1 
+                                : piece.type === 'child' && remainingLastRoll ?
+                                  (remainingLastRoll.value === 1 ? 1 : remainingLastRoll.value === 2 ? 2 : remainingLastRoll.value === 3 ? 3 : 0)
+                                : 0;
+                            
+                            if (chemmasToUse === 0 && useBase === 0) continue;
+                            
+                            const steps = (chemmasToUse * stepsPerChemma) + (useBase * baseSteps);
+                            const newIndex = piece.pathIndex + steps;
+                            
+                            if (newIndex > team.path.length - 1) continue;
+                            
+                            // Check if valid move
+                            const [newRow, newCol] = team.path[newIndex];
+                            let valid = true;
+                            
+                            if (!isSafeZone(newRow, newCol)) {
+                                const existing = getPieceAtForState(newRow, newCol, piecesState);
+                                if (existing && (existing.teamId === team.id || existing.type !== piece.type)) {
+                                    valid = false;
+                                }
+                            }
+                            
+                            if (valid) {
+                                // Try this move
+                                const newPiecesState = piecesState.map((p, idx) => 
+                                    idx === i ? { ...p, pathIndex: newIndex } : { ...p }
+                                );
+                                
+                                const newRemainingChemmas = remainingChemmas - chemmasToUse;
+                                const newRemainingLastRoll = useBase > 0 ? null : remainingLastRoll;
+                                
+                                if (tryAllCombinations(newRemainingChemmas, newRemainingLastRoll, newPiecesState)) {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                return false;
+            }
+            
+            const initialPiecesState = team.pieces.map(p => ({ 
+                id: p.id, 
+                type: p.type, 
+                pathIndex: p.pathIndex, 
+                dead: p.dead,
+                teamId: team.id
+            }));
+            
+            return tryAllCombinations(totalChemmas, lastRoll, initialPiecesState);
+        }
+
+        function getPieceAtForState(row, col, piecesState) {
+            for (let piece of piecesState) {
+                if (!piece.dead) {
+                    const team = gameState.teams.find(t => t.id === piece.teamId);
+                    const [pRow, pCol] = team.path[piece.pathIndex];
+                    if (pRow === row && pCol === col) return piece;
+                }
+            }
+            return null;
+        }
+
+        function updateRollHistory() {
+            const historyDiv = document.getElementById('rollHistoryContent');
+            historyDiv.innerHTML = '';
+            
+            const currentTeam = gameState.teams[gameState.currentTeamIndex];
+            
+            // Show last 20 rolls
+            const recentHistory = gameState.rollHistory.slice(-20).reverse();
+            recentHistory.forEach(entry => {
+                const entryDiv = document.createElement('div');
+                entryDiv.className = `history-entry ${entry.teamName === currentTeam.name ? 'current-team' : ''}`;
+                entryDiv.innerHTML = `<strong>${entry.teamName}</strong> - ${entry.playerName}: ${entry.roll} <span style="float: right; font-size: 11px; color: #999;">${entry.timestamp}</span>`;
+                historyDiv.appendChild(entryDiv);
+            });
+        }
+
+        function updateAccumulatedDisplay() {
+            const accDiv = document.getElementById('accumulatedRolls');
+            let text = 'Total Accumulated: ';
+            const items = [];
+            
+            if (gameState.totalChemmasThisTurn > 0) {
+                items.push(`${gameState.totalChemmasThisTurn} చమ్మా`);
+            }
+            
+            // Show all non-chemma rolls
+            const nonChemmaRolls = gameState.allRollsThisTurn.filter(r => r.value !== 'asta' && r.value !== 'chemma');
+            nonChemmaRolls.forEach(r => {
+                items.push(ROLL_NAMES[r.name].telugu);
+            });
+            
+            text += items.join(' + ');
+            accDiv.textContent = text;
+            accDiv.style.display = 'block';
+        }
+
+        function canMakeAnyMove() {
+            const team = gameState.teams[gameState.currentTeamIndex];
+            const player = team.players[gameState.currentPlayerIndex];
+            
+            // If no pandatam yet, chemma/asta always allows more rolls
+            if (!player.pandatam) return true;
+            
+            // Check if can revive any dead piece
+            const deadParent = team.pieces.find(p => p.type === 'parent' && p.dead);
+            const deadChildren = team.pieces.filter(p => p.type === 'child' && p.dead);
+            
+            if (deadParent && gameState.chemmasCount >= 2) return true;
+            if (deadChildren.length > 0 && gameState.chemmasCount >= 1) return true;
+            
+            // Check if there's any valid move possible
+            let hasAnyMove = false;
+            for (let piece of team.pieces) {
+                if (!piece.dead) {
+                    const dests = getAllValidDestinationsForCheck(team, piece, gameState.chemmasCount, gameState.lastRoll);
+                    if (dests.length > 0) {
+                        hasAnyMove = true;
+                        break;
+                    }
+                }
+            }
+            
+            if (!hasAnyMove) return false;
+            
+            // CRITICAL: Check if we can actually consume all accumulated values
+            // If we have too many chemmas/rolls for remaining moves, don't allow more rolls
+            return canConsumeAllValues(team);
+        }
+
+        function getAllValidDestinationsForCheck(team, piece, chemmasCount, lastRoll) {
+            const destinations = [];
+            const stepsPerChemma = piece.type === 'parent' ? 2 : 4;
+            const baseSteps = piece.type === 'parent' && lastRoll && lastRoll.value === 2 ? 1 
+                            : piece.type === 'child' && lastRoll ? 
+                              (lastRoll.value === 1 ? 1 : lastRoll.value === 2 ? 2 : lastRoll.value === 3 ? 3 : 0) 
+                            : 0;
+            
+            // Check if ANY piece on the team can use the last roll value
+            const canUseLastRoll = lastRoll && team.pieces.some(p => {
+                if (p.dead) return false;
+                const steps = p.type === 'parent' && lastRoll.value === 2 ? 1 
+                            : p.type === 'child' ? 
+                              (lastRoll.value === 1 ? 1 : lastRoll.value === 2 ? 2 : lastRoll.value === 3 ? 3 : 0) 
+                            : 0;
+                if (steps === 0) return false;
+                const newIdx = p.pathIndex + steps;
+                if (newIdx > team.path.length - 1 || p.pathIndex === team.path.length - 1) return false;
+                const [r, c] = team.path[newIdx];
+                if (!isSafeZone(r, c)) {
+                    const existing = getPieceAt(r, c);
+                    if (existing && (existing.team.id === team.id || existing.piece.type !== p.type)) return false;
+                }
+                return true;
+            });
+            
+            // Try all combinations
+            for (let chemmas = 0; chemmas <= chemmasCount; chemmas++) {
+                for (let useBase = 0; useBase <= (baseSteps > 0 ? 1 : 0); useBase++) {
+                    const steps = (chemmas * stepsPerChemma) + (useBase * baseSteps);
+                    if (steps > 0) {
+                        const dest = getDestinationForCheck(team, piece, steps, chemmas, useBase, canUseLastRoll);
+                        if (dest) destinations.push(dest);
+                    }
+                }
+            }
+            
+            return destinations;
+        }
+
+        function getDestinationForCheck(team, piece, steps, chemmasUsed, baseUsed, canUseLastRoll) {
+            const newIndex = piece.pathIndex + steps;
+            if (newIndex > team.path.length - 1 || piece.pathIndex === team.path.length - 1) return null;
+            
+            // Can't enter win position with Chemma ONLY if no piece can use last roll
+            if (newIndex === team.path.length - 1 && chemmasUsed > 0 && !baseUsed && !canUseLastRoll) {
+                return null;
+            }
+            
+            const [newRow, newCol] = team.path[newIndex];
+            if (!isSafeZone(newRow, newCol)) {
+                const existing = getPieceAt(newRow, newCol);
+                if (existing) {
+                    if (existing.team.id === team.id) return null;
+                    if (existing.piece.type !== piece.type) return null;
+                }
+            }
+            
+            return { row: newRow, col: newCol, steps, newIndex, chemmasUsed, baseUsed };
+        }
+
+        function saveInitialPositions() {
+            // Save positions of ALL teams' pieces at start of turn
+            gameState.initialPositions = gameState.teams.map(team => ({
+                teamId: team.id,
+                pieces: team.pieces.map(p => ({ 
+                    id: p.id,
+                    pathIndex: p.pathIndex, 
+                    dead: p.dead 
+                }))
+            }));
+            gameState.turnStartChemmas = gameState.chemmasCount;
+            gameState.turnStartLastRoll = gameState.lastRoll;
+            gameState.killedPieces = [];
+        }
+
+        function rollbackPositions() {
+            // Restore ALL teams' pieces to their initial positions
+            gameState.initialPositions.forEach(teamState => {
+                const team = gameState.teams[teamState.teamId];
+                teamState.pieces.forEach(pieceState => {
+                    const piece = team.pieces.find(p => p.id === pieceState.id);
+                    if (piece) {
+                        piece.pathIndex = pieceState.pathIndex;
+                        piece.dead = pieceState.dead;
+                    }
+                });
+            });
+            
+            gameState.chemmasCount = gameState.turnStartChemmas;
+            gameState.lastRoll = gameState.turnStartLastRoll;
+            gameState.moveHistory = [];
+            gameState.killedPieces = [];
+            renderPieces();
+            showTurnSummary();
+        }
+
+        function showTurnSummary() {
+            const summary = document.getElementById('turnSummary');
+            let text = '';
+            const items = [];
+            
+            if (gameState.chemmasCount > 0) {
+                items.push(`${gameState.chemmasCount} చమ్మా`);
+            }
+            if (gameState.lastRoll) {
+                items.push(ROLL_NAMES[gameState.lastRoll.name].telugu);
+            }
+            
+            if (items.length > 0) {
+                text = 'Remaining: ' + items.join(' + ');
+            } else {
+                text = 'All moves used';
+            }
+            
+            summary.textContent = text;
+            summary.classList.remove('hidden');
+        }
+
+        function processAllRolls() {
+            const team = gameState.teams[gameState.currentTeamIndex];
+            const player = team.players[gameState.currentPlayerIndex];
+
+            if (!player.pandatam) {
+                if (gameState.chemmasCount > 0) {
+                    player.pandatam = true;
+                    updateGameDisplay();
+                }
+            }
+            
+            // Update display to show revival options
+            updateGameDisplay();
+            findMovablePieces();
+        }
+
+        function findMovablePieces() {
+            if (gameState.chemmasCount === 0 && !gameState.lastRoll) {
+                if (gameState.killedThisTurn) {
+                    gameState.killedThisTurn = false;
+                    gameState.moveHistory = [];
+                    gameState.firstRollOfTurn = true;
+                    document.getElementById('rollBtn').disabled = false;
+                    showMessage('Killed! Roll again!');
+                } else {
+                    nextTurn();
+                }
+                return;
+            }
+
+            const team = gameState.teams[gameState.currentTeamIndex];
+            const player = team.players[gameState.currentPlayerIndex];
+            
+            // Check if player needs pandatam (but still allow revival)
+            if (!player.pandatam) {
+                // Check if can do pandatam or revive
+                const deadPieces = team.pieces.filter(p => p.dead);
+                if (deadPieces.length === 0 || gameState.chemmasCount === 0) {
+                    showMessage('Need Chemma/Asta for Pandatam. Turn skipped!');
+                    nextTurn();
+                    return;
+                }
+                // Has dead pieces and chemmas - let them revive
+                showMessage('Select a dead piece to revive or a piece to move');
+                highlightMovablePieces([]);
+                return;
+            }
+
+            const movablePieces = [];
+
+            team.pieces.forEach(p => {
+                if (!p.dead) {
+                    const dests = getAllValidDestinations(team, p);
+                    if (dests.length > 0) movablePieces.push(p);
+                }
+            });
+
+            // Check if can revive
+            const deadParent = team.pieces.find(p => p.type === 'parent' && p.dead);
+            const deadChildren = team.pieces.filter(p => p.type === 'child' && p.dead);
+            const canRevive = (deadParent && gameState.chemmasCount >= 2) || (deadChildren.length > 0 && gameState.chemmasCount >= 1);
+
+            if (movablePieces.length === 0 && !canRevive) {
+                // Complete deadlock - no moves and no revivals possible
+                if (gameState.moveHistory.length > 0 || gameState.killedPieces.length > 0) {
+                    // Try to let user undo manually first
+                    const killMsg = gameState.killedPieces.length > 0 ? ` ${gameState.killedPieces.length} kill(s) will be undone!` : '';
+                    showMessage(`DEADLOCK! Click moved piece to undo OR wait 3s for auto-rollback.${killMsg}`);
+                    highlightMovedPieces();
+                    
+                    // Auto-rollback after 3 seconds
+                    setTimeout(() => {
+                        // Check if still stuck
+                        if (gameState.moveHistory.length > 0 || gameState.killedPieces.length > 0) {
+                            const killedCount = gameState.killedPieces.length;
+                            showMessage(`Auto-rollback: All moves undone${killedCount > 0 ? `, ${killedCount} kill(s) restored` : ''}. Turn skipped!`);
+                            rollbackPositions();
+                            nextTurn();
+                        }
+                    }, 3000);
+                } else {
+                    showMessage('No valid moves. Turn skipped!');
+                    rollbackPositions();
+                    nextTurn();
+                }
+                return;
+            }
+
+            if (movablePieces.length === 0 && canRevive) {
+                showMessage('No pieces can move. Revive a dead piece!');
+                return;
+            }
+
+            highlightMovablePieces(movablePieces);
+            showMessage('Select a piece to move' + (canRevive ? ' or revive a dead piece' : ''));
+        }
+
+        function highlightMovedPieces() {
+            const team = gameState.teams[gameState.currentTeamIndex];
+            document.querySelectorAll('.piece').forEach(p => p.classList.remove('selectable'));
+            
+            gameState.moveHistory.forEach(move => {
+                const pieceEl = document.querySelector(`.piece[data-team-id="${team.id}"][data-piece-id="${move.pieceId}"]`);
+                if (pieceEl) {
+                    pieceEl.classList.add('selectable');
+                    pieceEl.style.borderColor = '#ff9800';
+                    pieceEl.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        rollbackPositions();
+                        setTimeout(() => findMovablePieces(), 300);
+                    }, { once: true });
+                }
+            });
+        }
+
+        function getAllValidDestinations(team, piece) {
+            const destinations = [];
+            const stepsPerChemma = piece.type === 'parent' ? 2 : 4;
+            const baseSteps = piece.type === 'parent' && gameState.lastRoll && gameState.lastRoll.value === 2 ? 1 
+                            : piece.type === 'child' && gameState.lastRoll ? 
+                              (gameState.lastRoll.value === 1 ? 1 : gameState.lastRoll.value === 2 ? 2 : gameState.lastRoll.value === 3 ? 3 : 0) 
+                            : 0;
+            
+            // Check if ANY piece on the team can use the last roll value
+            const canUseLastRoll = gameState.lastRoll && team.pieces.some(p => {
+                if (p.dead) return false;
+                const steps = p.type === 'parent' && gameState.lastRoll.value === 2 ? 1 
+                            : p.type === 'child' ? 
+                              (gameState.lastRoll.value === 1 ? 1 : gameState.lastRoll.value === 2 ? 2 : gameState.lastRoll.value === 3 ? 3 : 0) 
+                            : 0;
+                if (steps === 0) return false;
+                const newIdx = p.pathIndex + steps;
+                if (newIdx > team.path.length - 1 || p.pathIndex === team.path.length - 1) return false;
+                const [r, c] = team.path[newIdx];
+                if (!isSafeZone(r, c)) {
+                    const existing = getPieceAt(r, c);
+                    if (existing && (existing.team.id === team.id || existing.piece.type !== p.type)) return false;
+                }
+                return true;
+            });
+            
+            // Try all combinations - including using chemmas AND base together
+            for (let chemmas = 0; chemmas <= gameState.chemmasCount; chemmas++) {
+                // Try without base value
+                if (chemmas > 0) {
+                    const steps = chemmas * stepsPerChemma;
+                    const dest = getDestination(team, piece, steps, chemmas, 0, canUseLastRoll);
+                    if (dest && !destinations.some(d => d.row === dest.row && d.col === dest.col)) {
+                        destinations.push(dest);
+                    }
+                }
+                
+                // Try with base value
+                if (baseSteps > 0) {
+                    const steps = (chemmas * stepsPerChemma) + baseSteps;
+                    const dest = getDestination(team, piece, steps, chemmas, 1, canUseLastRoll);
+                    if (dest && !destinations.some(d => d.row === dest.row && d.col === dest.col)) {
+                        destinations.push(dest);
+                    }
+                }
+            }
+            
+            // Also try using only the base value (no chemmas)
+            if (baseSteps > 0) {
+                const dest = getDestination(team, piece, baseSteps, 0, 1, canUseLastRoll);
+                if (dest && !destinations.some(d => d.row === dest.row && d.col === dest.col)) {
+                    destinations.push(dest);
+                }
+            }
+            
+            return destinations;
+        }
+
+        function getDestination(team, piece, steps, chemmasUsed, baseUsed, canUseLastRoll) {
+            const newIndex = piece.pathIndex + steps;
+            if (newIndex > team.path.length - 1 || piece.pathIndex === team.path.length - 1) return null;
+            
+            // Can't enter win position with Chemma ONLY if no piece can use last roll
+            if (newIndex === team.path.length - 1 && chemmasUsed > 0 && !baseUsed && !canUseLastRoll) {
+                return null;
+            }
+            
+            const [newRow, newCol] = team.path[newIndex];
+            if (!isSafeZone(newRow, newCol)) {
+                const existing = getPieceAt(newRow, newCol);
+                if (existing) {
+                    if (existing.team.id === team.id) return null;
+                    if (existing.piece.type !== piece.type) return null;
+                }
+            }
+            
+            return { row: newRow, col: newCol, steps, newIndex, chemmasUsed, baseUsed };
+        }
+
+        function isSafeZone(row, col) { return row === 2 || col === 2; }
+
+        function getPieceAt(row, col) {
+            for (let team of gameState.teams) {
+                for (let piece of team.pieces) {
+                    if (!piece.dead) {
+                        const [pRow, pCol] = team.path[piece.pathIndex];
+                        if (pRow === row && pCol === col) return { team, piece };
+                    }
+                }
+            }
+            return null;
+        }
+
+        function highlightMovablePieces(pieces) {
+            document.querySelectorAll('.piece').forEach(p => p.classList.remove('selectable'));
+            const team = gameState.teams[gameState.currentTeamIndex];
+            pieces.forEach(piece => {
+                const pieceEl = document.querySelector(`.piece[data-team-id="${team.id}"][data-piece-id="${piece.id}"]`);
+                if (pieceEl) pieceEl.classList.add('selectable');
+            });
+        }
+
+        function handlePieceClick(teamId, pieceId) {
+            if (teamId !== gameState.currentTeamIndex) return;
+            
+            const team = gameState.teams[teamId];
+            const piece = team.pieces.find(p => p.id === pieceId);
+            if (!piece || piece.dead) return;
+
+            const destinations = getAllValidDestinations(team, piece);
+            if (destinations.length === 0) {
+                showMessage('No valid moves for this piece');
+                return;
+            }
+
+            // Allow reselecting pieces - clear previous selection
+            gameState.selectedPieceId = pieceId;
+            gameState.validDestinations = destinations;
+
+            if (destinations.length === 1) {
+                movePiece(piece, destinations[0]);
+            } else {
+                showValidDestinations();
+            }
+        }
+
+        function showValidDestinations() {
+            document.querySelectorAll('.cell').forEach(c => c.classList.remove('valid-dest'));
+            document.querySelectorAll('.piece').forEach(p => p.classList.remove('selectable'));
+            
+            gameState.validDestinations.forEach(d => {
+                const cell = document.querySelector(`.cell[data-row="${d.row}"][data-col="${d.col}"]`);
+                cell.classList.add('valid-dest');
+            });
+            
+            // Re-highlight all movable pieces
+            const team = gameState.teams[gameState.currentTeamIndex];
+            team.pieces.forEach(p => {
+                if (!p.dead) {
+                    const dests = getAllValidDestinations(team, p);
+                    if (dests.length > 0) {
+                        const pieceEl = document.querySelector(`.piece[data-team-id="${team.id}"][data-piece-id="${p.id}"]`);
+                        if (pieceEl) pieceEl.classList.add('selectable');
+                    }
+                }
+            });
+            
+            showMessage(`${gameState.selectedPieceId}: Select destination`);
+        }
+
+        function handleCellClick(row, col) {
+            if (!gameState.selectedPieceId) return;
+            
+            const dest = gameState.validDestinations.find(d => d.row === row && d.col === col);
+            if (!dest) return;
+            
+            const team = gameState.teams[gameState.currentTeamIndex];
+            const piece = team.pieces.find(p => p.id === gameState.selectedPieceId);
+            if (piece) {
+                movePiece(piece, dest);
+            }
+        }
+
+        function movePiece(piece, dest) {
+            const team = gameState.teams[gameState.currentTeamIndex];
+            
+            // Animate movement along path
+            animatePieceMovement(team, piece, dest.newIndex, () => {
+                // After animation completes
+                piece.pathIndex = dest.newIndex;
+                
+                // Save move for history tracking
+                gameState.moveHistory.push({
+                    pieceId: piece.id,
+                    oldIndex: dest.newIndex - dest.steps,
+                    newIndex: dest.newIndex,
+                    chemmasUsed: dest.chemmasUsed,
+                    baseUsed: dest.baseUsed
+                });
+
+                if (dest.chemmasUsed > 0) {
+                    gameState.chemmasCount -= dest.chemmasUsed;
+                }
+                if (dest.baseUsed > 0) {
+                    gameState.lastRoll = null;
+                }
+                
+                // Update displays - accumulated stays same, remaining changes
+                showTurnSummary();
+
+                gameState.selectedPieceId = null;
+                gameState.validDestinations = [];
+                document.querySelectorAll('.cell').forEach(c => c.classList.remove('valid-dest'));
+                document.querySelectorAll('.piece').forEach(p => p.classList.remove('selectable'));
+
+                renderPieces();
+
+                const killed = checkForKill(team, piece, dest.row, dest.col);
+                if (killed) {
+                    gameState.killedThisTurn = true;
+                }
+
+                // Check for win - but only if all values are consumed
+                if (team.pieces.every(p => p.pathIndex === team.path.length - 1)) {
+                    if (gameState.chemmasCount === 0 && !gameState.lastRoll) {
+                        document.getElementById('winnerText').textContent = `${team.name} Wins!`;
+                        document.getElementById('winModal').classList.add('show');
+                        return;
+                    } else {
+                        // Can't win with remaining values
+                        showMessage(`Can't win with remaining values: ${gameState.chemmasCount} చమ్మా${gameState.lastRoll ? ' + ' + ROLL_NAMES[gameState.lastRoll.name].telugu : ''}. Invalid turn!`);
+                        setTimeout(() => {
+                            rollbackPositions();
+                            nextTurn();
+                        }, 2000);
+                        return;
+                    }
+                }
+
+                updateGameDisplay();
+                setTimeout(() => findMovablePieces(), 500);
+            });
+        }
+
+        function animatePieceMovement(team, piece, targetIndex, callback) {
+            const startIndex = piece.pathIndex;
+            const steps = targetIndex - startIndex;
+            
+            if (steps <= 0) {
+                callback();
+                return;
+            }
+
+            let currentStep = 0;
+            
+            function animateStep() {
+                if (currentStep >= steps) {
+                    callback();
+                    return;
+                }
+                
+                currentStep++;
+                piece.pathIndex = startIndex + currentStep;
+                renderPieces();
+                
+                setTimeout(animateStep, 200); // 200ms per step
+            }
+            
+            animateStep();
+        }
+
+        function checkForKill(attackTeam, attackPiece, row, col) {
+            if (isSafeZone(row, col)) return false;
+            let killed = false;
+            gameState.teams.forEach(defTeam => {
+                if (defTeam.id !== attackTeam.id) {
+                    defTeam.pieces.forEach(defPiece => {
+                        if (!defPiece.dead) {
+                            const [defRow, defCol] = defTeam.path[defPiece.pathIndex];
+                            if (defRow === row && defCol === col && attackPiece.type === defPiece.type) {
+                                // Track this kill for potential rollback
+                                gameState.killedPieces.push({
+                                    teamId: defTeam.id,
+                                    pieceId: defPiece.id,
+                                    pathIndex: defPiece.pathIndex
+                                });
+                                
+                                defPiece.dead = true;
+                                defPiece.pathIndex = 0;
+                                killed = true;
+                                renderPieces();
+                                updateGameDisplay();
+                            }
+                        }
+                    });
+                }
+            });
+            return killed;
+        }
+
+        function revivePiece(teamId, pieceId) {
+            console.log('revivePiece called', teamId, pieceId, 'chemmas:', gameState.chemmasCount);
+            
+            // Only allow revival for current team during their turn
+            if (teamId !== gameState.currentTeamIndex) {
+                showMessage('Not your turn!');
+                return;
+            }
+            
+            const team = gameState.teams[teamId];
+            const piece = team.pieces.find(p => p.id === pieceId);
+            
+            if (!piece) {
+                showMessage('Piece not found');
+                console.log('Piece not found:', pieceId);
+                return;
+            }
+            
+            if (!piece.dead) {
+                showMessage('Piece is not dead');
+                console.log('Piece not dead:', piece);
+                return;
+            }
+
+            const cost = piece.type === 'parent' ? 2 : 1;
+            if (gameState.chemmasCount < cost) {
+                showMessage(`Need ${cost} Chemma${cost > 1 ? 's' : ''} to revive`);
+                console.log('Not enough chemmas. Need:', cost, 'Have:', gameState.chemmasCount);
+                return;
+            }
+
+            // Revive the piece
+            piece.dead = false;
+            piece.pathIndex = 0;
+            gameState.chemmasCount -= cost;
+            
+            console.log('Revived', pieceId, 'new state:', piece);
+            
+            showTurnSummary();
+            renderPieces();
+            updateGameDisplay();
+            showMessage(`${piece.id} revived! Now at origin.`);
+            
+            // Continue with moves after revival
+            setTimeout(() => findMovablePieces(), 500);
+        }
+
+        function nextTurn() {
+            const currentTeam = gameState.teams[gameState.currentTeamIndex];
+            gameState.currentPlayerIndex++;
+            if (gameState.currentPlayerIndex >= currentTeam.players.length) {
+                gameState.currentPlayerIndex = 0;
+                gameState.currentTeamIndex = (gameState.currentTeamIndex + 1) % gameState.teams.length;
+            }
+
+            gameState.chemmasCount = 0;
+            gameState.lastRoll = null;
+            gameState.killedThisTurn = false;
+            gameState.moveHistory = [];
+            gameState.killedPieces = [];
+            gameState.firstRollOfTurn = true;
+            gameState.totalChemmasThisTurn = 0;
+            gameState.allRollsThisTurn = [];
+            document.getElementById('rollBtn').disabled = false;
+            document.getElementById('seedsDisplay').innerHTML = '';
+            document.getElementById('diceResult').textContent = '';
+            document.getElementById('turnSummary').classList.add('hidden');
+            document.getElementById('accumulatedRolls').style.display = 'none';
+            document.getElementById('messageBox').classList.add('hidden');
+            updateGameDisplay();
+        }
+
+        function toggleCollapse(header) {
+            header.classList.toggle('collapsed');
+            const content = header.nextElementSibling;
+            content.classList.toggle('hidden');
+        }
+
+        function updateDeadPiecesDisplay() {
+            const deadSection = document.getElementById('deadPiecesSection');
+            const deadDisplay = document.getElementById('deadPiecesDisplay');
+            deadDisplay.innerHTML = '';
+            
+            const currentTeam = gameState.teams[gameState.currentTeamIndex];
+            let hasDeadPieces = false;
+            
+            gameState.teams.forEach(team => {
+                const deadPieces = team.pieces.filter(p => p.dead);
+                if (deadPieces.length > 0) {
+                    hasDeadPieces = true;
+                    deadPieces.forEach(piece => {
+                        const isCurrentTeam = team.id === currentTeam.id;
+                        const canRevive = isCurrentTeam && 
+                            ((piece.type === 'parent' && gameState.chemmasCount >= 2) || 
+                             (piece.type === 'child' && gameState.chemmasCount >= 1));
+                        
+                        const pieceDiv = document.createElement('div');
+                        pieceDiv.className = `dead-piece-item ${canRevive ? 'revivable' : 'not-revivable'}`;
+                        pieceDiv.style.background = canRevive ? '#90EE90' : '#ffcccc';
+                        pieceDiv.style.borderColor = team.color;
+                        
+                        if (canRevive) {
+                            pieceDiv.style.cursor = 'pointer';
+                            pieceDiv.onclick = () => revivePiece(team.id, piece.id);
+                            pieceDiv.title = 'Click to revive';
+                        }
+                        
+                        pieceDiv.innerHTML = `<span style="color: ${team.color};">●</span> ${team.name} - ${piece.id}${canRevive ? ' ⟳' : ''}`;
+                        deadDisplay.appendChild(pieceDiv);
+                    });
+                }
+            });
+            
+            deadSection.style.display = hasDeadPieces ? 'block' : 'none';
+        }
+
+        function updateGameDisplay() {
+            const team = gameState.teams[gameState.currentTeamIndex];
+            const player = team.players[gameState.currentPlayerIndex];
+
+            document.getElementById('currentTurnInfo').innerHTML = `
+                <h3 style="color: ${team.color};">${team.name}</h3>
+                <p style="font-size: 18px;"><strong>${player.name}</strong></p>
+                <p style="font-size: 14px; color: #666;">${player.pandatam ? '✓ Pandatam' : '✗ Need Pandatam'}</p>
+            `;
+
+            const statusDiv = document.getElementById('teamsStatus');
+            statusDiv.innerHTML = '';
+            gameState.teams.forEach(t => {
+                const isCurrentTeam = t.id === team.id;
+                
+                const teamDiv = document.createElement('div');
+                teamDiv.className = `team-status ${isCurrentTeam ? 'active' : ''}`;
+                
+                teamDiv.innerHTML = `
+                    <h3 style="color: ${t.color};">${t.name}</h3>
+                    <div style="margin-top: 5px; font-size: 14px; color: #666;">${t.players.map((p, i) => 
+                        (isCurrentTeam && i === gameState.currentPlayerIndex ? '<strong>' : '') + 
+                        p.name + ' ' + (p.pandatam ? '✓' : '✗') + 
+                        (isCurrentTeam && i === gameState.currentPlayerIndex ? '</strong>' : '')
+                    ).join(', ')}</div>
+                    <div class="piece-status" id="team${t.id}pieces"></div>
+                `;
+                statusDiv.appendChild(teamDiv);
+                
+                // Add pieces with click handlers
+                const piecesDiv = document.getElementById(`team${t.id}pieces`);
+                t.pieces.forEach(p => {
+                    const pos = t.path[p.pathIndex];
+                    const atWin = p.pathIndex === t.path.length - 1;
+                    
+                    const pieceInfo = document.createElement('div');
+                    pieceInfo.className = `piece-info ${p.dead ? 'dead' : ''}`;
+                    pieceInfo.style.background = p.dead ? '#ffcccc' : t.color + '20';
+                    pieceInfo.style.border = `2px solid ${t.color}`;
+                    
+                    pieceInfo.textContent = `${p.id}: ${p.dead ? 'Dead' : atWin ? 'WIN' : `(${pos[0]},${pos[1]})`}`;
+                    piecesDiv.appendChild(pieceInfo);
+                });
+            });
+            
+            // Update dead pieces display
+            updateDeadPiecesDisplay();
+        }
+
+        function showMessage(msg) {
+            document.getElementById('messageBox').textContent = msg;
+            document.getElementById('messageBox').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
