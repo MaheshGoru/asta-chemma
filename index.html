@@ -9,325 +9,470 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh; padding: 20px;
-        }
-        .container { max-width: 1400px; margin: 0 auto; }
-        .setup-screen, .game-screen { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-        .setup-screen { max-width: 600px; margin: 50px auto; }
-        h1 { text-align: center; color: #333; margin-bottom: 10px; font-size: 2.5em; }
-        .telugu-title { text-align: center; color: #667eea; font-size: 1.5em; margin-bottom: 30px; font-weight: bold; }
-        .form-group { margin-bottom: 25px; }
-        .form-group label { display: block; margin-bottom: 10px; color: #333; font-weight: bold; }
-        .form-group input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; }
-        .team-setup { margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px; }
-        .team-item { margin-bottom: 15px; padding: 15px; background: white; border-radius: 8px; }
-        button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white; padding: 15px 30px; border: none; border-radius: 8px;
-            font-size: 18px; cursor: pointer; width: 100%; margin-top: 20px; font-weight: bold;
-        }
-        button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
-        .game-screen { display: none; }
-        .game-layout { display: grid; grid-template-columns: 1fr 600px 1fr; gap: 30px; margin-top: 20px; }
-        
-        /* Mobile-first responsive design */
-        @media (max-width: 1200px) {
-            .game-layout { 
-                grid-template-columns: 1fr; 
-                gap: 15px; 
-                max-width: 100%;
-                padding: 10px;
-            }
-            .control-panel { order: 1; }
-            .board-container { order: 2; }
-            .control-panel:last-child { order: 3; }
-            
-            .board { 
-                grid-template-columns: repeat(5, 70px); 
-                grid-template-rows: repeat(5, 70px); 
-                margin: 0 auto;
-            }
-            .cell.safe::before { font-size: 45px; }
-            .piece { width: 16px; height: 16px; font-size: 7px; }
-            .piece.parent { width: 20px; height: 20px; font-size: 8px; }
-        }
-        
-        @media (max-width: 768px) {
-            body { padding: 10px; }
-            h1 { font-size: 1.8em; }
-            .telugu-title { font-size: 1.2em; }
-            
-            .board { 
-                grid-template-columns: repeat(5, 60px); 
-                grid-template-rows: repeat(5, 60px); 
-            }
-            .cell.safe::before { font-size: 35px; }
-            .piece { width: 14px; height: 14px; font-size: 6px; }
-            .piece.parent { width: 17px; height: 17px; font-size: 7px; }
-            
-            .seeds { width: 160px; height: 160px; }
-            .seed { width: 32px; height: 42px; }
-            
-            .current-turn h2 { font-size: 1.2em; }
-            .dice-result { font-size: 20px; }
-            
-            button { padding: 12px 20px; font-size: 16px; }
-        }
-        
-        @media (max-width: 480px) {
-            .board { 
-                grid-template-columns: repeat(5, 50px); 
-                grid-template-rows: repeat(5, 50px); 
-            }
-            .cell.safe::before { font-size: 28px; }
-            .piece { width: 12px; height: 12px; font-size: 5px; }
-            .piece.parent { width: 15px; height: 15px; font-size: 6px; }
-            
-            .seeds { width: 140px; height: 140px; }
-            .seed { width: 28px; height: 38px; }
-        }
-        
-        /* Collapsible sections */
-        .collapsible-section { 
-            background: white; 
-            border-radius: 10px; 
-            margin-bottom: 10px; 
+            width: 100vw;
+            height: 100vh;
             overflow: hidden;
         }
-        .collapsible-header { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white; 
-            padding: 12px 15px; 
-            cursor: pointer; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            font-weight: bold;
-            user-select: none;
-        }
-        .collapsible-header:hover { opacity: 0.9; }
-        .collapsible-header .toggle-icon { 
-            font-size: 20px; 
-            transition: transform 0.3s; 
-        }
-        .collapsible-header.collapsed .toggle-icon { transform: rotate(-90deg); }
-        .collapsible-content { 
-            padding: 15px; 
-            display: block;
-        }
-        .collapsible-content.hidden { display: none; }
+        .container { width: 100%; height: 100%; display: flex; flex-direction: column; }
         
-        /* Dead pieces display - always visible */
-        .dead-pieces-section { 
-            background: #fff3cd; 
-            border: 2px solid #ffc107; 
-            border-radius: 10px; 
-            padding: 15px; 
-            margin-bottom: 15px;
+        /* 3% Header: 80% title + 20% menu */
+        .header-row {
+            height: 3vh;
+            display: flex;
+            background: rgba(255,255,255,0.95);
         }
-        .dead-pieces-section h3 { 
-            margin: 0 0 10px 0; 
-            color: #856404; 
-            font-size: 16px;
-        }
-        .dead-piece-item { 
-            display: inline-block; 
-            padding: 8px 12px; 
-            margin: 5px; 
-            border-radius: 5px; 
-            font-size: 14px;
+        .game-title {
+            width: 80%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             font-weight: bold;
+            font-size: 1.8vh;
+            border-right: 2px solid #ddd;
         }
-        .dead-piece-item.revivable { 
-            background: #90EE90; 
-            cursor: pointer; 
-            animation: pulse 1s infinite;
+        .menu-container {
+            width: 20%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .menu-icon {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3vh;
+            cursor: pointer;
+        }
+        .menu-line {
+            width: 3vw;
+            height: 0.3vh;
+            background: #667eea;
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+        .menu-icon:hover .menu-line { background: #764ba2; }
+        
+        /* 2% Dead pieces revival */
+        .dead-revival-row {
+            height: 2vh;
+            background: #fff3cd;
+            border-bottom: 2px solid #ffc107;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 2%;
+        }
+        .dead-revival-row.show { display: flex; }
+        .revival-btn {
+            width: 30%;
+            height: 1.4vh;
+            background: #90EE90;
             border: 2px solid #4CAF50;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2vh;
+            color: #333;
         }
-        .dead-piece-item.not-revivable { 
-            background: #ffcccc; 
-            border: 2px solid #999;
-            opacity: 0.7;
+        .revival-btn:hover { background: #7CFC00; }
+        
+        /* 20% Controls */
+        .controls-row {
+            height: 20vh;
+            display: flex;
+            background: white;
         }
-        .board-container { display: flex; justify-content: center; align-items: center; }
+        .turn-section, .dice-section {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1vh;
+        }
+        .turn-section {
+            border-right: 2px solid #e0e0e0;
+            justify-content: center;
+        }
+        .turn-section h3 { font-size: 2.4vh; margin-bottom: 1vh; }
+        .turn-info { font-size: 1.6vh; text-align: center; }
+        
+        .dice-section {
+            justify-content: flex-start;
+            gap: 0.5vh;
+        }
+        .roll-btn {
+            width: 40%;
+            height: 3vh;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: clamp(10px, 1.4vh, 20px);
+        }
+        .roll-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .seeds {
+            position: relative;
+            width: 45%;
+            height: 15vh;
+            aspect-ratio: 1/1;
+            background: radial-gradient(circle, #8b7355 0%, #6b5644 100%);
+            border-radius: 50%;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.4);
+        }
+        .seed {
+            width: 18%;
+            height: 25%;
+            position: absolute;
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+        .seed.white { background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0id2hpdGVHcmFkIiBjeD0iNTAlIiBjeT0iNDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6I2ZmZmZmZjtzdG9wLW9wYWNpdHk6MSIgLz4KICAgICAgPHN0b3Agb2Zmc2V0PSI1MCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNmNWY1ZTg7c3RvcC1vcGFjaXR5OjEiIC8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6I2UwZTBkMDtzdG9wLW9wYWNpdHk6MSIgLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxlbGxpcHNlIGN4PSI1MCIgY3k9IjYwIiByeD0iNDIiIHJ5PSI1NSIgZmlsbD0idXJsKCN3aGl0ZUdyYWQpIiBzdHJva2U9IiNjMGMwYjAiIHN0cm9rZS13aWR0aD0iMiIvPgo8L3N2Zz4='); }
+        .seed.black { background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iYnJvd25HcmFkIiBjeD0iNTAlIiBjeT0iNDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzZiNGUzZjtzdG9wLW9wYWNpdHk6MSIgLz4KICAgICAgPHN0b3Agb2Zmc2V0PSI1MCUiIHN0eWxlPSJzdG9wLWNvbG9yOiM1YTNlMmY7c3RvcC1vcGFjaXR5OjEiIC8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6IzRhMmUxZjtzdG9wLW9wYWNpdHk6MSIgLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxlbGxpcHNlIGN4PSI1MCIgY3k9IjYwIiByeD0iNDIiIHJ5PSI1NSIgZmlsbD0idXJsKCNicm93bkdyYWQpIiBzdHJva2U9IiMzYTJlMWYiIHN0cm9rZS13aWR0aD0iMiIvPgo8L3N2Zz4='); }
+        .dice-result { font-size: 1.4vh; font-weight: bold; color: #667eea; }
+        
+        /* 5% Status messages: 2x2 grid */
+        .status-row {
+            height: 5vh;
+            display: grid;
+            grid-template-columns: 50% 50%;
+            grid-template-rows: 50% 50%;
+            background: white;
+            border-top: 2px solid #e0e0e0;
+        }
+        .status-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1vh;
+            font-weight: bold;
+            padding: 0 1%;
+            text-align: center;
+            overflow: hidden;
+        }
+        .status-cell.accumulated { background: #e8f5e9; color: #2e7d32; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; }
+        .status-cell.turn-sum { background: #e3f2fd; color: #1976d2; border-bottom: 1px solid #ddd; }
+        .status-cell.remaining { background: #fff3cd; color: #856404; border-right: 1px solid #ddd; }
+        .status-cell.message { background: #ffe4e1; color: #d32f2f; }
+        
+        /* 50% Board */
+        .board-row {
+            height: 50vh;
+            width: 100%;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1vh 2vw;
+        }
         .board {
-            display: grid; grid-template-columns: repeat(5, 100px); grid-template-rows: repeat(5, 100px);
-            gap: 2px; background: #333; padding: 2px; border: 4px solid #333; border-radius: 10px;
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-columns: repeat(5, 20%);
+            grid-template-rows: repeat(5, 20%);
+            gap: 0.2%;
+            background: #333;
+            padding: 0.5%;
+            border: 4px solid #333;
+            border-radius: 10px;
         }
-        .cell { background: white; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; }
+        .cell {
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+        }
         .cell.safe { background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%); }
-        .cell.safe::before { content: 'X'; position: absolute; font-size: 60px; color: rgba(255, 255, 255, 0.3); font-weight: bold; pointer-events: none; }
+        .cell.safe::before { content: 'X'; position: absolute; font-size: 4vh; color: rgba(255,255,255,0.3); font-weight: bold; }
         .cell.win { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-        .cell.valid-dest { box-shadow: inset 0 0 0 4px #2196F3; animation: blink 1s infinite; cursor: pointer; }
-        .cell.valid-dest:hover { background: rgba(33, 150, 243, 0.3); }
+        .cell.valid-dest { box-shadow: inset 0 0 0 3px #2196F3; animation: blink 1s infinite; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        
+        .pieces-on-cell { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2%; width: 90%; height: 90%; pointer-events: none; }
         .piece {
-            width: 22px; height: 22px; border-radius: 50%; border: 2px solid white;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 9px; color: white; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-            cursor: pointer; z-index: 100; position: relative; pointer-events: auto;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9vh;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            pointer-events: auto;
+            position: relative;
         }
-        .piece.parent { width: 26px; height: 26px; font-size: 10px; border-width: 3px; }
-        .piece.selectable { border-color: #4CAF50; box-shadow: 0 0 10px #4CAF50; }
-        .piece.selectable:hover { transform: scale(1.2); border-width: 3px; }
+        .piece::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            left: -30%;
+            right: -30%;
+            bottom: -30%;
+            cursor: pointer;
+        }
+        .piece.parent { border-width: 3px; font-size: 1.2vh; }
+        .piece.selectable { border-color: #4CAF50; box-shadow: 0 0 8px #4CAF50; }
         .team-color-0 { background: #e74c3c; }
         .team-color-1 { background: #3498db; }
         .team-color-2 { background: #2ecc71; }
         .team-color-3 { background: #f39c12; }
-        .control-panel { background: #f8f9fa; padding: 20px; border-radius: 10px; }
-        .current-turn { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; text-align: center; }
-        .current-turn h2 { color: #333; margin-bottom: 10px; }
-        .dice-container { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
-        .seeds { 
-            position: relative;
-            width: 200px; 
-            height: 200px; 
-            margin: 20px auto;
-            background: radial-gradient(circle, #8b7355 0%, #6b5644 100%);
-            border-radius: 50%;
-            box-shadow: inset 0 3px 10px rgba(0,0,0,0.4), 0 3px 15px rgba(0,0,0,0.3);
+        
+        /* 3% Footer */
+        .footer {
+            height: 3vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: clamp(8px, 1.2vh, 14px);
+            border-top: 2px solid rgba(255,255,255,0.2);
+            padding: 0 2vw;
+            text-align: center;
+            flex-wrap: wrap;
         }
-        .seed { 
-            width: 40px; 
-            height: 50px;
-            position: absolute;
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
-            transition: transform 0.3s ease;
-        }
-        .seed:hover { transform: scale(1.1); }
-        .seed.white { 
-            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0id2hpdGVHcmFkIiBjeD0iNTAlIiBjeT0iNDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6I2ZmZmZmZjtzdG9wLW9wYWNpdHk6MSIgLz4KICAgICAgPHN0b3Agb2Zmc2V0PSI1MCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNmNWY1ZTg7c3RvcC1vcGFjaXR5OjEiIC8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6I2UwZTBkMDtzdG9wLW9wYWNpdHk6MSIgLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9InNoaW5lIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6I2ZmZmZmZjtzdG9wLW9wYWNpdHk6MC42IiAvPgogICAgICA8c3RvcCBvZmZzZXQ9IjUwJSIgc3R5bGU9InN0b3AtY29sb3I6I2ZmZmZmZjtzdG9wLW9wYWNpdHk6MCIgLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDwhLS0gVGFtYXJpbmQgc2VlZCBzaGFwZSAtLT4KICA8ZWxsaXBzZSBjeD0iNTAiIGN5PSI2MCIgcng9IjQyIiByeT0iNTUiIGZpbGw9InVybCgjd2hpdGVHcmFkKSIgc3Ryb2tlPSIjYzBjMGIwIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8IS0tIFRleHR1cmUgbGluZXMgLS0+CiAgPGVsbGlwc2UgY3g9IjUwIiBjeT0iNDUiIHJ4PSIzMCIgcnk9IjIwIiBmaWxsPSJub25lIiBzdHJva2U9IiNlZWVlZTAiIHN0cm9rZS13aWR0aD0iMSIgb3BhY2l0eT0iMC40Ii8+CiAgPGVsbGlwc2UgY3g9IjUwIiBjeT0iNzAiIHJ4PSIzNSIgcnk9IjI1IiBmaWxsPSJub25lIiBzdHJva2U9IiNlZWVlZTAiIHN0cm9rZS13aWR0aD0iMSIgb3BhY2l0eT0iMC4zIi8+CiAgPCEtLSBTaGluZSBlZmZlY3QgLS0+CiAgPGVsbGlwc2UgY3g9IjM1IiBjeT0iNDAiIHJ4PSIyMCIgcnk9IjI1IiBmaWxsPSJ1cmwoI3NoaW5lKSIgb3BhY2l0eT0iMC4zIi8+Cjwvc3ZnPg=='); 
-        }
-        .seed.black { 
-            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iYnJvd25HcmFkIiBjeD0iNTAlIiBjeT0iNDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzZiNGUzZjtzdG9wLW9wYWNpdHk6MSIgLz4KICAgICAgPHN0b3Agb2Zmc2V0PSI1MCUiIHN0eWxlPSJzdG9wLWNvbG9yOiM1YTNlMmY7c3RvcC1vcGFjaXR5OjEiIC8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6IzRhMmUxZjtzdG9wLW9wYWNpdHk6MSIgLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9InNoaW5lQnJvd24iIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojOGI2ZTVmO3N0b3Atb3BhY2l0eTowLjQiIC8+CiAgICAgIDxzdG9wIG9mZnNldD0iNTAlIiBzdHlsZT0ic3RvcC1jb2xvcjojOGI2ZTVmO3N0b3Atb3BhY2l0eTowIiAvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPCEtLSBUYW1hcmluZCBzZWVkIHNoYXBlIC0tPgogIDxlbGxpcHNlIGN4PSI1MCIgY3k9IjYwIiByeD0iNDIiIHJ5PSI1NSIgZmlsbD0idXJsKCNicm93bkdyYWQpIiBzdHJva2U9IiMzYTJlMWYiIHN0cm9rZS13aWR0aD0iMiIvPgogIDwhLS0gVGV4dHVyZSBsaW5lcyAtLT4KICA8ZWxsaXBzZSBjeD0iNTAiIGN5PSI0NSIgcng9IjMwIiByeT0iMjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzViM2UyZiIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjMiLz4KICA8ZWxsaXBzZSBjeD0iNTAiIGN5PSI3MCIgcng9IjM1IiByeT0iMjUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzViM2UyZiIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjIiLz4KICA8IS0tIFNoaW5lIGVmZmVjdCAtLT4KICA8ZWxsaXBzZSBjeD0iMzUiIGN5PSI0MCIgcng9IjIwIiByeT0iMjUiIGZpbGw9InVybCgjc2hpbmVCcm93bikiIG9wYWNpdHk9IjAuMyIvPgo8L3N2Zz4='); 
-        }
-        .dice-result { text-align: center; font-size: 24px; font-weight: bold; color: #667eea; margin: 15px 0; }
-        .turn-summary { background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 15px 0; text-align: center; font-size: 16px; font-weight: bold; color: #1976d2; border: 2px solid #1976d2; }
-        .teams-status { background: white; padding: 20px; border-radius: 10px; }
-        .team-status { margin-bottom: 15px; padding: 15px; border-radius: 8px; background: #f8f9fa; }
-        .team-status.active { border: 3px solid #4CAF50; }
-        .piece-status { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
-        .piece-info { padding: 8px 12px; border-radius: 5px; background: white; font-size: 12px; cursor: pointer; }
-        .piece-info.dead { opacity: 0.5; background: #ffcccc; }
-        .piece-info.revivable { background: #90EE90; cursor: pointer; animation: pulse 1s infinite; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; }
+        
+        /* Modals 90% x 95% */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; align-items: center; justify-content: center; }
         .modal.show { display: flex; }
-        .modal-content { background: white; padding: 40px; border-radius: 20px; text-align: center; max-width: 500px; }
-        .win-animation { font-size: 80px; margin-bottom: 20px; }
-        .message-box { background: #fff3cd; border: 2px solid #ffc107; padding: 15px; border-radius: 8px; margin: 15px 0; color: #856404; }
-        .hidden { display: none; }
-        .pieces-on-cell { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; z-index: 50; position: relative; pointer-events: none; }
-        .roll-btn { background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); margin-bottom: 15px; }
-        .instructions { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
-        .instructions h3 { color: #333; margin-bottom: 10px; }
-        .instructions ul { margin-left: 20px; color: #666; line-height: 1.8; }
-        .roll-history { background: white; padding: 15px; border-radius: 10px; margin-top: 20px; max-height: 300px; overflow-y: auto; }
-        .roll-history h3 { color: #333; margin-bottom: 10px; font-size: 16px; }
-        .history-entry { padding: 8px; margin: 5px 0; border-left: 4px solid #ddd; background: #f8f9fa; border-radius: 4px; font-size: 13px; }
-        .history-entry.current-team { border-left-color: #4CAF50; background: #e8f5e9; }
+        .modal-content {
+            background: white;
+            width: 90vw;
+            height: 95vh;
+            border-radius: 15px;
+            position: relative;
+            overflow-y: auto;
+            padding: 3%;
+        }
+        .modal-content.win-modal {
+            width: 60vw;
+            height: auto;
+            max-height: 60vh;
+            padding: 5vh;
+        }
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 5vh;
+            cursor: pointer;
+            color: #666;
+            line-height: 1;
+            z-index: 10;
+        }
+        .modal-close:hover { color: #000; }
+        .modal h2 { font-size: 3vh; margin-bottom: 2vh; }
+        .modal ul { margin: 2vh; line-height: 2; font-size: 2vh; }
+        .modal li { margin-bottom: 1vh; }
+        
+        .setup-screen { 
+            background: white; 
+            padding: 3vh 5vw; 
+            border-radius: 20px; 
+            max-width: 90vw;
+            max-height: 90vh;
+            margin: 5vh auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .setup-screen h1 { 
+            text-align: center; 
+            color: #333; 
+            margin-bottom: 3vh; 
+            font-size: 3vh;
+        }
+        .form-group { margin-bottom: 2vh; }
+        .form-group label { 
+            display: block; 
+            margin-bottom: 1vh; 
+            color: #333; 
+            font-weight: bold; 
+            font-size: 1.8vh;
+        }
+        .form-group input { 
+            width: 100%; 
+            padding: 1.5vh; 
+            border: 2px solid #e0e0e0; 
+            border-radius: 8px; 
+            font-size: 1.8vh;
+        }
+        .team-setup { 
+            margin-top: 2vh; 
+            padding: 2vh; 
+            background: #f8f9fa; 
+            border-radius: 10px; 
+            max-height: 40vh;
+            overflow-y: auto;
+            flex-shrink: 1;
+        }
+        .team-item { 
+            margin-bottom: 2vh; 
+            padding: 2vh; 
+            background: white; 
+            border-radius: 8px; 
+        }
+        .team-item h4 {
+            font-size: 2vh;
+            margin-bottom: 1vh;
+        }
+        .team-item input {
+            width: 100%;
+            padding: 1.2vh;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 1.6vh;
+            margin-top: 1vh;
+        }
+        .setup-screen button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            padding: 2vh 4vw; 
+            border: none; 
+            border-radius: 8px;
+            font-size: 2vh; 
+            width: 100%; 
+            margin-top: 2vh; 
+            font-weight: bold; 
+            cursor: pointer;
+        }
+        .setup-screen button:hover { opacity: 0.9; }
+        .setup-screen button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .hidden { display: none !important; }
+        .setup-screen h1 { text-align: center; color: #333; margin-bottom: 30px; }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Setup Screen -->
         <div class="setup-screen" id="setupScreen">
-            <h1>Ashta Chemma</h1>
-            <div class="telugu-title">అష్టా చమ్మా</div>
+            <h1>Ashta Chemma - అష్టా చమ్మా</h1>
             <div class="form-group">
-                <label for="numTeams">Number of Teams (2-4):</label>
+                <label>Number of Teams (2-4):</label>
                 <input type="number" id="numTeams" min="2" max="4" value="2">
             </div>
             <div class="form-group">
-                <label for="teamSize">Team Size (1-2 players):</label>
-                <input type="number" id="teamSize" min="1" max="2" value="1">
+                <label>Players per Team (1-2, same for all):</label>
+                <input type="number" id="playersPerTeam" min="1" max="2" value="1">
             </div>
-            <div id="teamSetup" class="team-setup"></div>
-            <button onclick="startGame()">Start Game</button>
+            <button onclick="generateTeamInputs()">Next</button>
+            
+            <div class="team-setup hidden" id="teamSetup"></div>
+            <button class="hidden" id="startBtn" onclick="startGame()">Start Game</button>
         </div>
 
-        <div class="game-screen" id="gameScreen">
-            <h1>Ashta Chemma - అష్టా చమ్మా</h1>
-            
-            <!-- Dead Pieces Section - Always Visible -->
-            <div class="dead-pieces-section" id="deadPiecesSection" style="display: none;">
-                <h3>💀 Dead Pieces (Click to Revive)</h3>
-                <div id="deadPiecesDisplay"></div>
+        <!-- Game Screen -->
+        <div class="container hidden" id="gameScreen">
+            <!-- 3% Header -->
+            <div class="header-row">
+                <div class="game-title">Ashta Chemma - అష్టా చమ్మా</div>
+                <div class="menu-container" onclick="openMenuModal()">
+                    <div class="menu-icon">
+                        <div class="menu-line"></div>
+                        <div class="menu-line"></div>
+                        <div class="menu-line"></div>
+                    </div>
+                </div>
             </div>
             
-            <div class="game-layout">
-                <div class="control-panel">
-                    <div class="current-turn">
-                        <h2>Current Turn</h2>
-                        <div id="currentTurnInfo"></div>
-                    </div>
-                    <div class="dice-container">
-                        <h3 style="text-align: center; margin-bottom: 15px;">Roll Dice</h3>
-                        <button class="roll-btn" onclick="rollDice()" id="rollBtn">Roll Seeds</button>
-                        <div class="seeds" id="seedsDisplay"></div>
-                        <div class="dice-result" id="diceResult"></div>
-                        <div class="accumulated-rolls" id="accumulatedRolls" style="background: #e8f5e9; padding: 10px; border-radius: 8px; margin: 10px 0; font-weight: bold; color: #2e7d32; text-align: center; display: none;"></div>
-                        <div class="turn-summary hidden" id="turnSummary"></div>
-                        <div class="message-box hidden" id="messageBox"></div>
-                    </div>
-                    
-                    <!-- Collapsible Reference Guide -->
-                    <div class="collapsible-section">
-                        <div class="collapsible-header" onclick="toggleCollapse(this)">
-                            <span>Reference Guide</span>
-                            <span class="toggle-icon">▼</span>
-                        </div>
-                        <div class="collapsible-content">
-                            <ul style="margin-left: 20px; color: #666; line-height: 1.8;">
-                                <li><strong>Asta (అష్టా):</strong> All same</li>
-                                <li><strong>Chemma (చమ్మా):</strong> 4 whites</li>
-                                <li><strong>Mudu (మూడు):</strong> 3 whites</li>
-                                <li><strong>Rendu (రెండు):</strong> 2 whites</li>
-                                <li><strong>Kinnu (కిన్ను):</strong> 1 white</li>
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <!-- Collapsible Roll History -->
-                    <div class="collapsible-section">
-                        <div class="collapsible-header collapsed" onclick="toggleCollapse(this)">
-                            <span>Roll History</span>
-                            <span class="toggle-icon">▼</span>
-                        </div>
-                        <div class="collapsible-content hidden">
-                            <div id="rollHistoryContent" style="max-height: 300px; overflow-y: auto;"></div>
-                        </div>
-                    </div>
+            <!-- 2% Dead Revival -->
+            <div class="dead-revival-row" id="deadRevivalRow"></div>
+            
+            <!-- 20% Controls -->
+            <div class="controls-row">
+                <div class="turn-section">
+                    <h3>Current Turn</h3>
+                    <div class="turn-info" id="currentTurnInfo"></div>
                 </div>
-                
-                <div class="board-container">
-                    <div class="board" id="gameBoard"></div>
+                <div class="dice-section">
+                    <button class="roll-btn" onclick="rollDice()" id="rollBtn">పిక్కలు వెయ్యు!</button>
+                    <div class="seeds" id="seedsDisplay"></div>
                 </div>
-                
-                <div class="control-panel">
-                    <!-- Collapsible Teams Status -->
-                    <div class="collapsible-section">
-                        <div class="collapsible-header collapsed" onclick="toggleCollapse(this)">
-                            <span>Teams Status</span>
-                            <span class="toggle-icon">▼</span>
-                        </div>
-                        <div class="collapsible-content hidden">
-                            <div id="teamsStatus"></div>
-                        </div>
-                    </div>
-                </div>
+            </div>
+            
+            <!-- 5% Status Grid -->
+            <div class="status-row">
+                <div class="status-cell accumulated" id="accumulatedCell"></div>
+                <div class="status-cell turn-sum" id="turnCell"></div>
+                <div class="status-cell remaining" id="remainingCell"></div>
+                <div class="status-cell message" id="messageCell"></div>
+            </div>
+            
+            <!-- 50% Board -->
+            <div class="board-row">
+                <div class="board" id="gameBoard"></div>
+            </div>
+            
+            <!-- 3% Footer -->
+            <div class="footer">
+                © 2024 Ashta Chemma (అష్టా చమ్మా) | Developed by Mahesh G & Dhana Lakshmi S
             </div>
         </div>
 
-        <div class="modal" id="winModal">
+        <!-- Menu Modal -->
+        <div class="modal" id="menuModal">
             <div class="modal-content">
-                <div class="win-animation">🏆</div>
+                <span class="modal-close" onclick="closeModal('menuModal')">×</span>
+                <h2>Menu</h2>
+                <button onclick="closeModal('menuModal'); openModal('referenceModal')" style="width: 100%; padding: 15px; margin: 10px 0; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 2vh; cursor: pointer;">📖 Reference Guide</button>
+                <button onclick="closeModal('menuModal'); openModal('historyModal')" style="width: 100%; padding: 15px; margin: 10px 0; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 2vh; cursor: pointer;">📜 Roll History</button>
+                <button onclick="closeModal('menuModal'); openModal('statusModal')" style="width: 100%; padding: 15px; margin: 10px 0; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 2vh; cursor: pointer;">👥 Team Status</button>
+            </div>
+        </div>
+
+        <!-- Reference Modal -->
+        <div class="modal" id="referenceModal">
+            <div class="modal-content">
+                <span class="modal-close" onclick="closeModal('referenceModal')">×</span>
+                <h2>Reference Guide</h2>
+                <ul>
+                    <li><strong>Asta (అష్టా):</strong> All same color = 2 Chemmas</li>
+                    <li><strong>Chemma (చమ్మా):</strong> 4 whites = Extra turn</li>
+                    <li><strong>Mudu (మూడు):</strong> 3 whites</li>
+                    <li><strong>Rendu (రెండు):</strong> 2 whites</li>
+                    <li><strong>Kinnu (కిన్ను):</strong> 1 white</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- History Modal -->
+        <div class="modal" id="historyModal">
+            <div class="modal-content">
+                <span class="modal-close" onclick="closeModal('historyModal')">×</span>
+                <h2>Roll History</h2>
+                <div id="rollHistoryContent" style="font-size: 1.8vh;"></div>
+            </div>
+        </div>
+
+        <!-- Status Modal -->
+        <div class="modal" id="statusModal">
+            <div class="modal-content">
+                <span class="modal-close" onclick="closeModal('statusModal')">×</span>
+                <h2>Teams Status</h2>
+                <div id="teamsStatusModal"></div>
+            </div>
+        </div>
+
+        <!-- Win Modal -->
+        <div class="modal" id="winModal">
+            <div class="modal-content win-modal" style="text-align: center;">
+                <div style="font-size: 10vh;">🏆</div>
                 <h2 id="winnerText"></h2>
-                <p>Congratulations!</p>
-                <button onclick="location.reload()">Play Again</button>
+                <p style="font-size: 2vh; margin: 2vh 0;">Congratulations!</p>
+                <button onclick="location.reload()" style="padding: 15px 40px; background: #4CAF50; color: white; border: none; border-radius: 8px; font-size: 2vh; cursor: pointer;">Play Again</button>
             </div>
         </div>
     </div>
@@ -353,60 +498,82 @@
             '2,4': [[2,4], [1,4], [0,4], [0,3], [0,2], [0,1], [0,0], [1,0], [2,0], [3,0], [4,0], [4,1], [4,2], [4,3], [4,4], [3,4], [3,3], [3,2], [3,1], [2,1], [1,1], [1,2], [1,3], [2,3], [2,2]]
         };
 
-        document.getElementById('numTeams').addEventListener('input', updateTeamSetup);
-        document.getElementById('teamSize').addEventListener('input', updateTeamSetup);
-
-        function updateTeamSetup() {
+        function generateTeamInputs() {
             const numTeams = parseInt(document.getElementById('numTeams').value);
-            const teamSize = parseInt(document.getElementById('teamSize').value);
-            const teamSetup = document.getElementById('teamSetup');
-            teamSetup.innerHTML = '';
+            const playersPerTeam = parseInt(document.getElementById('playersPerTeam').value);
+            
+            if (numTeams < 2 || numTeams > 4 || playersPerTeam < 1 || playersPerTeam > 2) {
+                alert('Invalid values! Teams: 2-4, Players: 1-2');
+                return;
+            }
+            
+            const setupDiv = document.getElementById('teamSetup');
+            setupDiv.innerHTML = '<h3>Enter Team and Player Names</h3>';
             
             for (let i = 0; i < numTeams; i++) {
-                let html = `<div class="team-item"><h3 style="color: ${TEAM_COLORS[i]};">Team ${i + 1} (${TEAM_NAMES[i]})</h3>`;
-                for (let p = 0; p < teamSize; p++) {
-                    html += `<input type="text" placeholder="Player ${p + 1}" id="team${i}player${p}" style="width: 100%; margin-top: 5px; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">`;
-                }
-                html += '</div>';
-                teamSetup.innerHTML += html;
+                const teamItem = document.createElement('div');
+                teamItem.className = 'team-item';
+                teamItem.innerHTML = `
+                    <h4>Team ${i + 1}</h4>
+                    <input type="text" id="teamName${i}" placeholder="Team Name" value="Team ${i + 1}">
+                    ${Array.from({length: playersPerTeam}, (_, j) => 
+                        `<input type="text" id="player${i}_${j}" placeholder="Player ${j + 1}" value="Player ${j + 1}" style="margin-top: 10px;">`
+                    ).join('')}
+                `;
+                setupDiv.appendChild(teamItem);
             }
+            
+            setupDiv.classList.remove('hidden');
+            document.getElementById('startBtn').classList.remove('hidden');
         }
-
-        updateTeamSetup();
 
         function startGame() {
             const numTeams = parseInt(document.getElementById('numTeams').value);
-            const teamSize = parseInt(document.getElementById('teamSize').value);
-            if (numTeams < 2 || numTeams > 4) { alert('Select 2-4 teams'); return; }
-
+            const playersPerTeam = parseInt(document.getElementById('playersPerTeam').value);
+            
             gameState.teams = [];
+            
+            // Use opposite corners for 2 teams: positions 0 and 2 (top-left and bottom-left)
             const selectedPositions = numTeams === 2 ? [0, 2] : numTeams === 3 ? [0, 1, 2] : [0, 1, 2, 3];
-
+            
             for (let i = 0; i < numTeams; i++) {
+                const teamName = document.getElementById(`teamName${i}`).value || `Team ${i + 1}`;
                 const players = [];
-                for (let p = 0; p < teamSize; p++) {
-                    const input = document.getElementById(`team${i}player${p}`);
-                    players.push({ name: input.value.trim() || `Player ${p + 1}`, pandatam: false });
+                
+                for (let j = 0; j < playersPerTeam; j++) {
+                    const playerName = document.getElementById(`player${i}_${j}`).value || `Player ${j + 1}`;
+                    players.push({ name: playerName, pandatam: false });
                 }
-                const startPos = START_POSITIONS[selectedPositions[i]];
+                
+                const [startRow, startCol] = START_POSITIONS[selectedPositions[i]];
                 gameState.teams.push({
-                    id: i, color: TEAM_COLORS[i], name: TEAM_NAMES[i], players: players,
+                    id: i,
+                    name: teamName,
+                    color: TEAM_COLORS[i],
+                    players: players,
+                    path: PATHS[`${startRow},${startCol}`],
                     pieces: [
-                        { id: 'P', type: 'parent', dead: false, pathIndex: 0 },
-                        { id: 'C1', type: 'child', dead: false, pathIndex: 0 },
-                        { id: 'C2', type: 'child', dead: false, pathIndex: 0 }
-                    ],
-                    path: PATHS[`${startPos[0]},${startPos[1]}`]
+                        { id: 'P', type: 'parent', pathIndex: 0, dead: false },
+                        { id: 'C1', type: 'child', pathIndex: 0, dead: false },
+                        { id: 'C2', type: 'child', pathIndex: 0, dead: false }
+                    ]
                 });
             }
-
-            document.getElementById('setupScreen').style.display = 'none';
-            document.getElementById('gameScreen').style.display = 'block';
-            initializeBoard();
-            updateGameDisplay();
+            
+            document.getElementById('setupScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            
+            initGame();
         }
 
-        function initializeBoard() {
+        function initGame() {
+            renderBoard();
+            renderPieces();
+            updateGameDisplay();
+            clearStatusCells();
+        }
+
+        function renderBoard() {
             const board = document.getElementById('gameBoard');
             board.innerHTML = '';
             for (let row = 0; row < 5; row++) {
@@ -469,10 +636,17 @@
                 if (isWhite) whiteCount++;
             }
 
-            // Position seeds randomly in circle without overlap
             const seedsDisplay = document.getElementById('seedsDisplay');
             seedsDisplay.innerHTML = '';
-            const positions = generateNonOverlappingPositions(5, 200, 40, 50);
+            
+            // Get actual circle dimensions
+            const circleRect = seedsDisplay.getBoundingClientRect();
+            const circleWidth = circleRect.width;
+            const circleHeight = circleRect.height;
+            const seedWidth = circleWidth * 0.18;
+            const seedHeight = circleHeight * 0.25;
+            
+            const positions = generateNonOverlappingPositions(5, circleWidth, seedWidth, seedHeight);
             
             seeds.forEach((isWhite, index) => {
                 const seed = document.createElement('div');
@@ -489,8 +663,6 @@
             else if (whiteCount === 3) { rollName = 3; rollValue = 3; }
             else if (whiteCount === 2) { rollName = 2; rollValue = 2; }
             else { rollName = 1; rollValue = 1; }
-
-            document.getElementById('diceResult').textContent = `${ROLL_NAMES[rollName].english} (${ROLL_NAMES[rollName].telugu})`;
 
             if (rollValue === 'asta') {
                 gameState.chemmasCount += 2;
@@ -544,10 +716,11 @@
 
         function generateNonOverlappingPositions(count, circleSize, itemWidth, itemHeight) {
             const positions = [];
-            const radius = (circleSize - Math.max(itemWidth, itemHeight)) / 2;
-            const centerX = circleSize / 2 - itemWidth / 2;
-            const centerY = circleSize / 2 - itemHeight / 2;
-            const minDistance = Math.max(itemWidth, itemHeight) * 0.7;
+            // 80% of the circle radius
+            const maxRadius = (circleSize / 2) * 0.8;
+            const centerX = (circleSize - itemWidth) / 2;
+            const centerY = (circleSize - itemHeight) / 2;
+            const minDistance = Math.max(itemWidth, itemHeight) * 0.4;
             
             for (let i = 0; i < count; i++) {
                 let attempts = 0;
@@ -555,7 +728,8 @@
                 
                 do {
                     const angle = Math.random() * Math.PI * 2;
-                    const dist = Math.random() * radius * 0.7;
+                    // Random distance within 80% radius
+                    const dist = Math.random() * maxRadius;
                     pos = {
                         x: centerX + Math.cos(angle) * dist,
                         y: centerY + Math.sin(angle) * dist
@@ -664,34 +838,36 @@
             
             const currentTeam = gameState.teams[gameState.currentTeamIndex];
             
-            // Show last 20 rolls
             const recentHistory = gameState.rollHistory.slice(-20).reverse();
             recentHistory.forEach(entry => {
                 const entryDiv = document.createElement('div');
-                entryDiv.className = `history-entry ${entry.teamName === currentTeam.name ? 'current-team' : ''}`;
-                entryDiv.innerHTML = `<strong>${entry.teamName}</strong> - ${entry.playerName}: ${entry.roll} <span style="float: right; font-size: 11px; color: #999;">${entry.timestamp}</span>`;
+                entryDiv.style.padding = '1vh';
+                entryDiv.style.margin = '0.5vh 0';
+                entryDiv.style.borderLeft = entry.teamName === currentTeam.name ? '4px solid #4CAF50' : '4px solid #ddd';
+                entryDiv.style.background = entry.teamName === currentTeam.name ? '#e8f5e9' : '#f8f9fa';
+                entryDiv.style.borderRadius = '4px';
+                entryDiv.style.fontSize = '1.8vh';
+                entryDiv.innerHTML = `<strong>${entry.teamName}</strong> - ${entry.playerName}: ${entry.roll} <span style="float: right; font-size: 1.4vh; color: #999;">${entry.timestamp}</span>`;
                 historyDiv.appendChild(entryDiv);
             });
         }
 
         function updateAccumulatedDisplay() {
-            const accDiv = document.getElementById('accumulatedRolls');
-            let text = 'Total Accumulated: ';
+            const cell = document.getElementById('accumulatedCell');
+            let text = '';
             const items = [];
             
             if (gameState.totalChemmasThisTurn > 0) {
                 items.push(`${gameState.totalChemmasThisTurn} చమ్మా`);
             }
             
-            // Show all non-chemma rolls
             const nonChemmaRolls = gameState.allRollsThisTurn.filter(r => r.value !== 'asta' && r.value !== 'chemma');
             nonChemmaRolls.forEach(r => {
                 items.push(ROLL_NAMES[r.name].telugu);
             });
             
-            text += items.join(' + ');
-            accDiv.textContent = text;
-            accDiv.style.display = 'block';
+            text = 'Total: ' + (items.length > 0 ? items.join(' + ') : '-');
+            cell.textContent = text;
         }
 
         function canMakeAnyMove() {
@@ -825,7 +1001,11 @@
         }
 
         function showTurnSummary() {
-            const summary = document.getElementById('turnSummary');
+            const turnCell = document.getElementById('turnCell');
+            const remainCell = document.getElementById('remainingCell');
+            
+            turnCell.textContent = `Current: ${gameState.lastRoll ? ROLL_NAMES[gameState.lastRoll.name].telugu : '-'}`;
+            
             let text = '';
             const items = [];
             
@@ -836,14 +1016,8 @@
                 items.push(ROLL_NAMES[gameState.lastRoll.name].telugu);
             }
             
-            if (items.length > 0) {
-                text = 'Remaining: ' + items.join(' + ');
-            } else {
-                text = 'All moves used';
-            }
-            
-            summary.textContent = text;
-            summary.classList.remove('hidden');
+            text = 'Remaining: ' + (items.length > 0 ? items.join(' + ') : 'None');
+            remainCell.textContent = text;
         }
 
         function processAllRolls() {
@@ -1306,10 +1480,7 @@
             gameState.allRollsThisTurn = [];
             document.getElementById('rollBtn').disabled = false;
             document.getElementById('seedsDisplay').innerHTML = '';
-            document.getElementById('diceResult').textContent = '';
-            document.getElementById('turnSummary').classList.add('hidden');
-            document.getElementById('accumulatedRolls').style.display = 'none';
-            document.getElementById('messageBox').classList.add('hidden');
+            clearStatusCells();
             updateGameDisplay();
         }
 
@@ -1319,42 +1490,12 @@
             content.classList.toggle('hidden');
         }
 
-        function updateDeadPiecesDisplay() {
-            const deadSection = document.getElementById('deadPiecesSection');
-            const deadDisplay = document.getElementById('deadPiecesDisplay');
-            deadDisplay.innerHTML = '';
-            
-            const currentTeam = gameState.teams[gameState.currentTeamIndex];
-            let hasDeadPieces = false;
-            
-            gameState.teams.forEach(team => {
-                const deadPieces = team.pieces.filter(p => p.dead);
-                if (deadPieces.length > 0) {
-                    hasDeadPieces = true;
-                    deadPieces.forEach(piece => {
-                        const isCurrentTeam = team.id === currentTeam.id;
-                        const canRevive = isCurrentTeam && 
-                            ((piece.type === 'parent' && gameState.chemmasCount >= 2) || 
-                             (piece.type === 'child' && gameState.chemmasCount >= 1));
-                        
-                        const pieceDiv = document.createElement('div');
-                        pieceDiv.className = `dead-piece-item ${canRevive ? 'revivable' : 'not-revivable'}`;
-                        pieceDiv.style.background = canRevive ? '#90EE90' : '#ffcccc';
-                        pieceDiv.style.borderColor = team.color;
-                        
-                        if (canRevive) {
-                            pieceDiv.style.cursor = 'pointer';
-                            pieceDiv.onclick = () => revivePiece(team.id, piece.id);
-                            pieceDiv.title = 'Click to revive';
-                        }
-                        
-                        pieceDiv.innerHTML = `<span style="color: ${team.color};">●</span> ${team.name} - ${piece.id}${canRevive ? ' ⟳' : ''}`;
-                        deadDisplay.appendChild(pieceDiv);
-                    });
-                }
-            });
-            
-            deadSection.style.display = hasDeadPieces ? 'block' : 'none';
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
         }
 
         function updateGameDisplay() {
@@ -1364,52 +1505,105 @@
             document.getElementById('currentTurnInfo').innerHTML = `
                 <h3 style="color: ${team.color};">${team.name}</h3>
                 <p style="font-size: 18px;"><strong>${player.name}</strong></p>
-                <p style="font-size: 14px; color: #666;">${player.pandatam ? '✓ Pandatam' : '✗ Need Pandatam'}</p>
+                <p style="font-size: 14px; color: #666;">పంట పండావా?: ${player.pandatam ? '<span style="color: green;">✓</span>' : '<span style="color: red;">✗</span>'}</p>
             `;
 
-            const statusDiv = document.getElementById('teamsStatus');
+            const statusDiv = document.getElementById('teamsStatusModal');
             statusDiv.innerHTML = '';
             gameState.teams.forEach(t => {
                 const isCurrentTeam = t.id === team.id;
                 
                 const teamDiv = document.createElement('div');
-                teamDiv.className = `team-status ${isCurrentTeam ? 'active' : ''}`;
+                teamDiv.style.marginBottom = '2vh';
+                teamDiv.style.padding = '2vh';
+                teamDiv.style.borderRadius = '8px';
+                teamDiv.style.background = isCurrentTeam ? '#e8f5e9' : '#f8f9fa';
+                teamDiv.style.border = isCurrentTeam ? '3px solid #4CAF50' : '1px solid #ddd';
                 
-                teamDiv.innerHTML = `
-                    <h3 style="color: ${t.color};">${t.name}</h3>
-                    <div style="margin-top: 5px; font-size: 14px; color: #666;">${t.players.map((p, i) => 
-                        (isCurrentTeam && i === gameState.currentPlayerIndex ? '<strong>' : '') + 
-                        p.name + ' ' + (p.pandatam ? '✓' : '✗') + 
-                        (isCurrentTeam && i === gameState.currentPlayerIndex ? '</strong>' : '')
-                    ).join(', ')}</div>
-                    <div class="piece-status" id="team${t.id}pieces"></div>
-                `;
-                statusDiv.appendChild(teamDiv);
-                
-                // Add pieces with click handlers
-                const piecesDiv = document.getElementById(`team${t.id}pieces`);
+                let piecesHTML = '';
                 t.pieces.forEach(p => {
                     const pos = t.path[p.pathIndex];
                     const atWin = p.pathIndex === t.path.length - 1;
-                    
-                    const pieceInfo = document.createElement('div');
-                    pieceInfo.className = `piece-info ${p.dead ? 'dead' : ''}`;
-                    pieceInfo.style.background = p.dead ? '#ffcccc' : t.color + '20';
-                    pieceInfo.style.border = `2px solid ${t.color}`;
-                    
-                    pieceInfo.textContent = `${p.id}: ${p.dead ? 'Dead' : atWin ? 'WIN' : `(${pos[0]},${pos[1]})`}`;
-                    piecesDiv.appendChild(pieceInfo);
+                    const status = p.dead ? '💀 Dead' : atWin ? '🏆 WIN' : `📍 (${pos[0]},${pos[1]})`;
+                    piecesHTML += `<div style="padding: 1vh; margin: 0.5vh 0; background: white; border-radius: 5px; border-left: 4px solid ${t.color}; font-size: 1.8vh;">${p.id}: ${status}</div>`;
                 });
+                
+                teamDiv.innerHTML = `
+                    <h3 style="color: ${t.color}; margin-bottom: 1vh; font-size: 2.5vh;">${t.name} ${isCurrentTeam ? '(Playing)' : ''}</h3>
+                    <div style="font-size: 1.6vh; color: #666; margin-bottom: 1vh;">
+                        ${t.players.map((p, i) => 
+                            p.name + ' పంట: ' + (p.pandatam ? '<span style="color: green;">✓</span>' : '<span style="color: red;">✗</span>')
+                        ).join(' | ')}
+                    </div>
+                    ${piecesHTML}
+                `;
+                statusDiv.appendChild(teamDiv);
             });
             
             // Update dead pieces display
-            updateDeadPiecesDisplay();
+            updateDeadRevivalDisplay();
         }
 
         function showMessage(msg) {
             document.getElementById('messageBox').textContent = msg;
             document.getElementById('messageBox').classList.remove('hidden');
         }
+        function showMessage(msg) {
+            document.getElementById('messageCell').textContent = msg;
+        }
+
+        function openMenuModal() {
+            openModal('menuModal');
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        function updateDeadRevivalDisplay() {
+            const revivalRow = document.getElementById('deadRevivalRow');
+            const currentTeam = gameState.teams[gameState.currentTeamIndex];
+            
+            const deadPieces = currentTeam.pieces.filter(p => p.dead);
+            const revivableParent = deadPieces.find(p => p.type === 'parent' && gameState.chemmasCount >= 2);
+            const revivableChildren = deadPieces.filter(p => p.type === 'child' && gameState.chemmasCount >= 1);
+            
+            if (revivableParent || revivableChildren.length > 0) {
+                revivalRow.innerHTML = '';
+                
+                if (revivableParent) {
+                    const btn = document.createElement('div');
+                    btn.className = 'revival-btn';
+                    btn.textContent = `⟳ Revive ${revivableParent.id}`;
+                    btn.onclick = () => revivePiece(currentTeam.id, revivableParent.id);
+                    revivalRow.appendChild(btn);
+                }
+                
+                revivableChildren.forEach(child => {
+                    const btn = document.createElement('div');
+                    btn.className = 'revival-btn';
+                    btn.textContent = `⟳ Revive ${child.id}`;
+                    btn.onclick = () => revivePiece(currentTeam.id, child.id);
+                    revivalRow.appendChild(btn);
+                });
+                
+                revivalRow.classList.add('show');
+            } else {
+                revivalRow.classList.remove('show');
+            }
+        }
+
+        function clearStatusCells() {
+            document.getElementById('accumulatedCell').textContent = '-';
+            document.getElementById('turnCell').textContent = '-';
+            document.getElementById('remainingCell').textContent = '-';
+            document.getElementById('messageCell').textContent = '-';
+        }
+
     </script>
 </body>
 </html>
