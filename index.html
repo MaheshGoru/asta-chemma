@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ashta Chemma - అష్టా చమ్మా</title>
+    <title>Asta Chemma - అష్టా చమ్మా</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -12,24 +12,24 @@
             width: 100vw;
             height: 100vh;
             overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        .container { width: 100%; height: 100%; display: flex; flex-direction: column; }
+        .container { width: 100%; height: 100%; display: flex; flex-direction: column; max-width: 600px; margin: 0 auto; position: relative; }
         
         /* 3% Header: 80% title + 20% menu */
         .header-row {
             height: 3vh;
             display: flex;
-            background: rgba(255,255,255,0.95);
+            background: white;
         }
         .game-title {
             width: 80%;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #667eea;
             font-weight: bold;
             font-size: 1.8vh;
             border-right: 2px solid #ddd;
@@ -100,8 +100,8 @@
             border-right: 2px solid #e0e0e0;
             justify-content: center;
         }
-        .turn-section h3 { font-size: 2.4vh; margin-bottom: 1vh; }
-        .turn-info { font-size: 1.6vh; text-align: center; }
+        .turn-section h3 { font-size: 2.4vh; margin-bottom: 1vh; color: #333; }
+        .turn-info { font-size: 1.6vh; text-align: center; color: #333; }
         
         .dice-section {
             justify-content: flex-start;
@@ -136,7 +136,7 @@
             background-size: contain;
             background-repeat: no-repeat;
         }
-        .seed.white { background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0id2hpdGVHcmFkIiBjeD0iNTAlIiBjeT0iNDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6I2ZmZmZmZjtzdG9wLW9wYWNpdHk6MSIgLz4KICAgICAgPHN0b3Agb2Zmc2V0PSI1MCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNmNWY1ZTg7c3RvcC1vcGFjaXR5OjEiIC8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6I2UwZTBkMDtzdG9wLW9wYWNpdHk6MSIgLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxlbGxpcHNlIGN4PSI1MCIgY3k9IjYwIiByeD0iNDIiIHJ5PSI1NSIgZmlsbD0idXJsKCN3aGl0ZUdyYWQpIiBzdHJva2U9IiNjMGMwYjAiIHN0cm9rZS13aWR0aD0iMiIvPgo8L3N2Zz4='); }
+        .seed.white { background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0id2hpdGVHcmFkIiBjeD0iNTAlIiBjeT0iNDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6I2ZmZmZmZjtzdG9wLW9wYWNpdHk6MSIgLz4KICAgICAgPHN0b3Agb2Zmc2V0PSI1MCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNmNWY1ZTg7c3RvcC1vcGFjaXR5OjEiIC8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6I2UwZTBkMDtzdG9wLW9wYWNpdHk6MSIgLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxlbGxpcHNlIGN4PSI1MCIgY3k9IjYwIiByeD0iNDIiIHJ5PSI1NSIgZmlsbD0idXJsKCN3aGl0ZUdyYWQpIiBzdHJva2U9IiM4QjQ1MTMiIHN0cm9rZS13aWR0aD0iOCIvPgo8L3N2Zz4='); }
         .seed.black { background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iYnJvd25HcmFkIiBjeD0iNTAlIiBjeT0iNDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzZiNGUzZjtzdG9wLW9wYWNpdHk6MSIgLz4KICAgICAgPHN0b3Agb2Zmc2V0PSI1MCUiIHN0eWxlPSJzdG9wLWNvbG9yOiM1YTNlMmY7c3RvcC1vcGFjaXR5OjEiIC8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6IzRhMmUxZjtzdG9wLW9wYWNpdHk6MSIgLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxlbGxpcHNlIGN4PSI1MCIgY3k9IjYwIiByeD0iNDIiIHJ5PSI1NSIgZmlsbD0idXJsKCNicm93bkdyYWQpIiBzdHJva2U9IiMzYTJlMWYiIHN0cm9rZS13aWR0aD0iMiIvPgo8L3N2Zz4='); }
         .dice-result { font-size: 1.4vh; font-weight: bold; color: #667eea; }
         
@@ -164,7 +164,6 @@
         .status-cell.remaining { background: #fff3cd; color: #856404; border-right: 1px solid #ddd; }
         .status-cell.message { background: #ffe4e1; color: #d32f2f; }
         
-        /* 50% Board */
         .board-row {
             height: 50vh;
             width: 100%;
@@ -172,7 +171,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 1vh 2vw;
+            padding: 2vh 2vw;
+            flex: 1;
         }
         .board {
             width: 100%;
@@ -180,42 +180,74 @@
             display: grid;
             grid-template-columns: repeat(5, 20%);
             grid-template-rows: repeat(5, 20%);
-            gap: 0.2%;
-            background: #333;
-            padding: 0.5%;
-            border: 4px solid #333;
+            gap: 0;
+            background: #8B4513;
+            padding: 1%;
+            outline: 6px solid #654321;
+            outline-offset: -3px;
             border-radius: 10px;
         }
         .cell {
-            background: white;
+            background: #C0C0C0;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
             cursor: pointer;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+            margin: 0.2%;
         }
-        .cell.safe { background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%); }
-        .cell.safe::before { content: 'X'; position: absolute; font-size: 4vh; color: rgba(255,255,255,0.3); font-weight: bold; pointer-events: none; }
-        .cell.win { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .cell.safe { 
+            background: #D2B48C;
+            box-shadow: inset 0 2px 5px rgba(210,180,140,0.4);
+        }
+        .cell.safe::before { 
+            content: ''; 
+            position: absolute; 
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(to bottom right, transparent calc(50% - 1px), rgba(139,69,19,0.4) calc(50% - 1px), rgba(139,69,19,0.4) calc(50% + 1px), transparent calc(50% + 1px)),
+                linear-gradient(to bottom left, transparent calc(50% - 1px), rgba(139,69,19,0.4) calc(50% - 1px), rgba(139,69,19,0.4) calc(50% + 1px), transparent calc(50% + 1px));
+            pointer-events: none; 
+        }
+        .cell.win { 
+            background: #8B7355;
+            box-shadow: inset 0 3px 8px rgba(139,115,85,0.5);
+            border: 2px solid #654321;
+        }
         .cell.valid-dest { box-shadow: inset 0 0 0 3px #2196F3; animation: blink 1s infinite; z-index: 100; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
         
-        .pieces-on-cell { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1%; width: 95%; height: 95%; pointer-events: none; position: absolute; }
+        .pieces-on-cell { 
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2%;
+            width: 95%;
+            height: 95%;
+            pointer-events: none;
+            position: absolute;
+            align-items: center;
+            justify-content: center;
+            padding: 2%;
+        }
         .piece {
-            width: 100%;
-            height: 100%;
+            flex: 0 0 auto;
+            aspect-ratio: 1/1;
             border-radius: 50%;
             border: 1px solid white;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.6vh;
             color: white;
             font-weight: bold;
             cursor: pointer;
             pointer-events: auto;
         }
-        .piece.parent { border-width: 2px; font-size: 0.8vh; }
+        .piece.parent { 
+            border-width: 2px;
+            z-index: 10;
+        }
         .piece.selectable { border-color: #4CAF50; box-shadow: 0 0 5px #4CAF50; }
         .team-color-0 { background: #e74c3c; }
         .team-color-1 { background: #3498db; }
@@ -228,12 +260,15 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            color: #333;
+            background: rgba(255,255,255,0.9);
             font-size: clamp(8px, 1.2vh, 14px);
-            border-top: 2px solid rgba(255,255,255,0.2);
+            border-top: 2px solid rgba(139,69,19,0.2);
             padding: 0 2vw;
             text-align: center;
             flex-wrap: wrap;
+            margin-top: auto;
+            flex-shrink: 0;
         }
         
         /* Modals 90% x 95% */
@@ -349,7 +384,7 @@
     <div class="container">
         <!-- Setup Screen -->
         <div class="setup-screen" id="setupScreen">
-            <h1>Ashta Chemma - అష్టా చమ్మా</h1>
+            <h1>Asta Chemma - అష్టా చమ్మా</h1>
             <div class="form-group">
                 <label>Number of Teams (2-4):</label>
                 <input type="number" id="numTeams" min="2" max="4" value="2">
@@ -368,7 +403,7 @@
         <div class="container hidden" id="gameScreen">
             <!-- 3% Header -->
             <div class="header-row">
-                <div class="game-title">Ashta Chemma - అష్టా చమ్మా</div>
+                <div class="game-title">Asta Chemma - అష్టా చమ్మా</div>
                 <div class="menu-container" onclick="openMenuModal()">
                     <div class="menu-icon">
                         <div class="menu-line"></div>
@@ -408,7 +443,7 @@
             
             <!-- 3% Footer -->
             <div class="footer">
-                © 2025 Ashta Chemma (అష్టా చమ్మా) | Developed by Mahesh G & Dhana Lakshmi S
+                © 2025 Asta Chemma (అష్టా చమ్మా) | Developed by Mahesh G & Dhana Lakshmi S
             </div>
         </div>
 
@@ -583,6 +618,20 @@
 
         function renderPieces() {
             document.querySelectorAll('.pieces-on-cell').forEach(el => el.remove());
+            
+            // First pass: count pieces per cell
+            const cellPieceCounts = {};
+            gameState.teams.forEach(team => {
+                team.pieces.forEach(piece => {
+                    if (!piece.dead) {
+                        const [row, col] = team.path[piece.pathIndex];
+                        const key = `${row},${col}`;
+                        cellPieceCounts[key] = (cellPieceCounts[key] || 0) + 1;
+                    }
+                });
+            });
+            
+            // Second pass: render with dynamic sizing
             gameState.teams.forEach(team => {
                 team.pieces.forEach(piece => {
                     if (!piece.dead) {
@@ -594,11 +643,34 @@
                             piecesDiv.className = 'pieces-on-cell';
                             cell.appendChild(piecesDiv);
                         }
+                        
+                        const key = `${row},${col}`;
+                        const pieceCount = cellPieceCounts[key];
+                        
                         const pieceEl = document.createElement('div');
                         pieceEl.className = `piece team-color-${team.id} ${piece.type}`;
                         pieceEl.textContent = piece.id;
                         pieceEl.dataset.teamId = team.id;
                         pieceEl.dataset.pieceId = piece.id;
+                        
+                        // Dynamic sizing based on piece count
+                        let size;
+                        if (pieceCount <= 3) {
+                            size = piece.type === 'parent' ? '45%' : '30%';
+                        } else if (pieceCount <= 6) {
+                            size = piece.type === 'parent' ? '35%' : '25%';
+                        } else if (pieceCount <= 9) {
+                            size = piece.type === 'parent' ? '30%' : '20%';
+                        } else {
+                            size = piece.type === 'parent' ? '24%' : '16%';
+                        }
+                        
+                        pieceEl.style.maxWidth = size;
+                        pieceEl.style.maxHeight = size;
+                        pieceEl.style.minWidth = size;
+                        pieceEl.style.minHeight = size;
+                        pieceEl.style.fontSize = piece.type === 'parent' ? '1.2vh' : '0.8vh';
+                        
                         pieceEl.addEventListener('click', (e) => {
                             e.stopPropagation();
                             handlePieceClick(team.id, piece.id);
@@ -631,18 +703,17 @@
             
             // Get actual circle dimensions
             const circleRect = seedsDisplay.getBoundingClientRect();
-            const circleWidth = circleRect.width;
-            const circleHeight = circleRect.height;
-            const seedWidth = circleWidth * 0.18;
-            const seedHeight = circleHeight * 0.25;
+            const circleRadius = Math.min(circleRect.width, circleRect.height) / 2;
+            const seedRadius = circleRadius * 0.09; // Approximate seed radius as percentage of circle
             
-            const positions = generateNonOverlappingPositions(5, circleWidth, seedWidth, seedHeight);
+            const positions = generateNonOverlappingPositions(5, circleRadius, seedRadius);
             
             seeds.forEach((isWhite, index) => {
                 const seed = document.createElement('div');
                 seed.className = `seed ${isWhite ? 'white' : 'black'}`;
-                seed.style.left = positions[index].x + 'px';
-                seed.style.top = positions[index].y + 'px';
+                // Position is from center, need to offset to top-left corner for absolute positioning
+                seed.style.left = (positions[index].x - seedRadius) + 'px';
+                seed.style.top = (positions[index].y - seedRadius) + 'px';
                 seed.style.transform = `rotate(${Math.random() * 360}deg)`;
                 seedsDisplay.appendChild(seed);
             });
@@ -704,14 +775,14 @@
             }
         }
 
-        function generateNonOverlappingPositions(count, circleSize, itemWidth, itemHeight) {
+        function generateNonOverlappingPositions(count, circleRadius, seedRadius) {
             const positions = [];
-            // Calculate 80% of radius from center
-            const centerRadius = circleSize / 2;
-            const maxRadius = centerRadius * 0.8 - Math.max(itemWidth, itemHeight) / 2; // Subtract item size to keep fully inside
-            const centerX = (circleSize - itemWidth) / 2;
-            const centerY = (circleSize - itemHeight) / 2;
-            const minDistance = Math.max(itemWidth, itemHeight) * 0.4;
+            
+            // 80% of circle radius minus seed radius to keep seed completely inside
+            const maxPlacementRadius = (circleRadius * 0.8) - seedRadius;
+            
+            // Minimum distance between seed centers
+            const minDistance = seedRadius * 2.5;
             
             for (let i = 0; i < count; i++) {
                 let attempts = 0;
@@ -719,10 +790,12 @@
                 
                 do {
                     const angle = Math.random() * Math.PI * 2;
-                    const dist = Math.random() * maxRadius; // Random distance within 80% radius
+                    const dist = Math.random() * maxPlacementRadius;
+                    
+                    // Position relative to circle center
                     pos = {
-                        x: centerX + Math.cos(angle) * dist,
-                        y: centerY + Math.sin(angle) * dist
+                        x: circleRadius + Math.cos(angle) * dist,
+                        y: circleRadius + Math.sin(angle) * dist
                     };
                     attempts++;
                 } while (attempts < 100 && positions.some(p => 
@@ -1494,7 +1567,7 @@
 
             document.getElementById('currentTurnInfo').innerHTML = `
                 <h3 style="color: ${team.color};">${team.name}</h3>
-                <p style="font-size: 18px;"><strong>${player.name}</strong></p>
+                <p style="font-size: 18px; color: #333;"><strong>${player.name}</strong></p>
                 <p style="font-size: 14px; color: #666;">పంట పండావా?: ${player.pandatam ? '<span style="color: green;">✓</span>' : '<span style="color: red;">✗</span>'}</p>
             `;
 
