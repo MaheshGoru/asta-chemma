@@ -6,12 +6,12 @@
     <title>Asta Chemma - అష్టా చమ్మా</title>
     
     <!-- Google Analytics 4 -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-EF4QMK5ZRJ"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        gtag('config', 'G-EF4QMK5ZRJ', {
+        gtag('config', 'GA_MEASUREMENT_ID', {
             page_title: 'Asta Chemma Game',
             page_path: window.location.pathname
         });
@@ -23,6 +23,10 @@
             }
         }
     </script>
+    
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4447516670587927"
+     crossorigin="anonymous"></script>
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -280,6 +284,17 @@
         .team-color-3 { background: #f39c12; }
         
         /* 3% Footer */
+        .ad-container {
+            background: white;
+            padding: 1vh 2vw;
+            min-height: 90px;
+            max-height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
         .footer {
             height: 4vh;
             display: flex;
@@ -421,6 +436,20 @@
             <button onclick="generateTeamInputs()">Next</button>
             
             <div class="team-setup hidden" id="teamSetup"></div>
+            
+            <!-- Ad Space in Setup -->
+            <div class="ad-container" style="margin-top: 2vh;">
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                     data-ad-slot="ZZZZZZZZZZ"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                     (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+            
             <button class="hidden" id="startBtn" onclick="startGame()">Start Game</button>
         </div>
 
@@ -464,6 +493,20 @@
             <!-- 50% Board -->
             <div class="board-row">
                 <div class="board" id="gameBoard"></div>
+            </div>
+            
+            <!-- Ad Space -->
+            <div class="ad-container">
+                <!-- Display Ad - Responsive -->
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                     data-ad-slot="YYYYYYYYYY"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                     (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
             </div>
             
             <!-- 3% Footer -->
