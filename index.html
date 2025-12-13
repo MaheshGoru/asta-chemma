@@ -2,21 +2,43 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Asta Chemma - అష్టా చమ్మా</title>
+    
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-EF4QMK5ZRJ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-EF4QMK5ZRJ', {
+            page_title: 'Asta Chemma Game',
+            page_path: window.location.pathname
+        });
+        
+        // Helper function for tracking events
+        function trackEvent(eventName, eventParams = {}) {
+            if (typeof gtag !== 'undefined') {
+                gtag('event', eventName, eventParams);
+            }
+        }
+    </script>
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             width: 100vw;
-            height: 100vh;
+            height: 100dvh;
+            min-height: -webkit-fill-available;
             overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
-        .container { width: 100%; height: 95vh; display: flex; flex-direction: column; max-width: 600px; margin: 0 auto; position: relative; overflow: hidden; }
+        .container { width: 100%; height: 100%; max-height: 100dvh; display: flex; flex-direction: column; max-width: 600px; margin: 0 auto; position: relative; overflow: hidden; }
         
         /* 3% Header: 80% title + 20% menu */
         .header-row {
@@ -383,15 +405,6 @@
         .setup-screen h1 { text-align: center; color: #333; margin-bottom: 30px; }
     </style>
 </head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-EF4QMK5ZRJ"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-EF4QMK5ZRJ');
-</script>
 <body>
     <div class="container">
         <!-- Setup Screen -->
@@ -568,6 +581,11 @@
             const numTeams = parseInt(document.getElementById('numTeams').value);
             const playersPerTeam = parseInt(document.getElementById('playersPerTeam').value);
             
+            trackEvent('game_start', {
+                num_teams: numTeams,
+                players_per_team: playersPerTeam
+            });
+            
             gameState.teams = [];
             
             // Use opposite corners for 2 teams: positions 0 and 2 (top-left and bottom-left)
@@ -736,6 +754,11 @@
             else if (whiteCount === 3) { rollName = 3; rollValue = 3; }
             else if (whiteCount === 2) { rollName = 2; rollValue = 2; }
             else { rollName = 1; rollValue = 1; }
+            
+            trackEvent('dice_roll', {
+                roll_type: rollName,
+                white_count: whiteCount
+            });
 
             if (rollValue === 'asta') {
                 gameState.chemmasCount += 2;
@@ -1415,6 +1438,10 @@
                 // Check for win - but only if all values are consumed
                 if (team.pieces.every(p => p.pathIndex === team.path.length - 1)) {
                     if (gameState.chemmasCount === 0 && !gameState.lastRoll) {
+                        trackEvent('game_won', {
+                            winning_team: team.name,
+                            team_index: team.id
+                        });
                         document.getElementById('winnerText').textContent = `${team.name} Wins!`;
                         document.getElementById('winModal').classList.add('show');
                         return;
