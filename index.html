@@ -815,9 +815,17 @@
             if (rollValue === 'asta') {
                 gameState.chemmasCount += 2;
                 gameState.totalChemmasThisTurn += 2;
+                trackEvent('asta_rolled', {
+                    team: gameState.teams[gameState.currentTeamIndex].name,
+                    accumulated_chemmas: gameState.chemmasCount
+                });
             } else if (rollValue === 'chemma') {
                 gameState.chemmasCount += 1;
                 gameState.totalChemmasThisTurn += 1;
+                trackEvent('chemma_rolled', {
+                    team: gameState.teams[gameState.currentTeamIndex].name,
+                    got_extra_turn: true
+                });
             }
             
             gameState.lastRoll = { name: rollName, value: rollValue };
@@ -1130,6 +1138,11 @@
         }
 
         function rollbackPositions() {
+            trackEvent('rollback_used', {
+                team: gameState.teams[gameState.currentTeamIndex].name,
+                moves_rolled_back: gameState.moveHistory.length
+            });
+            
             // Restore ALL teams' pieces to their initial positions
             gameState.initialPositions.forEach(teamState => {
                 const team = gameState.teams[teamState.teamId];
@@ -1396,9 +1409,20 @@
 
             const destinations = getAllValidDestinations(team, piece);
             if (destinations.length === 0) {
+                trackEvent('no_moves_available', {
+                    team: team.name,
+                    roll_value: gameState.lastRoll || 'none'
+                });
                 showMessage('No valid moves for this piece');
                 return;
             }
+
+            trackEvent('piece_selected', {
+                team: team.name,
+                piece_type: piece.isParent ? 'parent' : 'child',
+                position: piece.pathIndex,
+                num_valid_moves: destinations.length
+            });
 
             // Allow reselecting pieces - clear previous selection
             gameState.selectedPieceId = pieceId;
@@ -1407,6 +1431,9 @@
             if (destinations.length === 1) {
                 movePiece(piece, destinations[0]);
             } else {
+                trackEvent('valid_moves_displayed', {
+                    num_options: destinations.length
+                });
                 showValidDestinations();
             }
         }
@@ -1450,11 +1477,30 @@
 
         function movePiece(piece, dest) {
             const team = gameState.teams[gameState.currentTeamIndex];
+            const oldIndex = piece.pathIndex;
             
             // Animate movement along path
             animatePieceMovement(team, piece, dest.newIndex, () => {
                 // After animation completes
                 piece.pathIndex = dest.newIndex;
+                
+                trackEvent('piece_moved', {
+                    team: team.name,
+                    from_position: oldIndex,
+                    to_position: dest.newIndex,
+                    distance: dest.steps,
+                    chemmas_used: dest.chemmasUsed,
+                    base_value_used: dest.baseUsed
+                });
+                
+                // Check for pandatam
+                if (piece.pathIndex >= team.path.length - 1 && !piece.pandatam) {
+                    piece.pandatam = true;
+                    trackEvent('pandatam_achieved', {
+                        team: team.name,
+                        player_name: piece.isParent ? 'Parent' : 'Child'
+                    });
+                }
                 
                 // Save move for history tracking
                 gameState.moveHistory.push({
@@ -1556,6 +1602,13 @@
                                     pathIndex: defPiece.pathIndex
                                 });
                                 
+                                trackEvent('piece_killed', {
+                                    killer_team: attackTeam.name,
+                                    victim_team: defTeam.name,
+                                    piece_type: defPiece.type,
+                                    position: defPiece.pathIndex
+                                });
+                                
                                 defPiece.dead = true;
                                 defPiece.pathIndex = 0;
                                 killed = true;
@@ -1605,6 +1658,12 @@
             piece.pathIndex = 0;
             gameState.chemmasCount -= cost;
             
+            trackEvent('piece_revived', {
+                team: team.name,
+                piece_type: piece.type,
+                revival_cost: cost
+            });
+            
             console.log('Revived', pieceId, 'new state:', piece);
             
             showTurnSummary();
@@ -1618,6 +1677,15 @@
 
         function nextTurn() {
             const currentTeam = gameState.teams[gameState.currentTeamIndex];
+            
+            trackEvent('turn_ended', {
+                team: currentTeam.name,
+                moves_made: gameState.moveHistory.length,
+                rolls_taken: gameState.allRollsThisTurn.length,
+                chemmas_accumulated: gameState.totalChemmasThisTurn,
+                pieces_killed: gameState.killedThisTurn ? 1 : 0
+            });
+            
             gameState.currentPlayerIndex++;
             if (gameState.currentPlayerIndex >= currentTeam.players.length) {
                 gameState.currentPlayerIndex = 0;
@@ -1645,6 +1713,14 @@
         }
 
         function openModal(modalId) {
+            const eventMap = {
+                'referenceModal': 'reference_viewed',
+                'historyModal': 'history_viewed',
+                'statusModal': 'status_viewed'
+            };
+            if (eventMap[modalId]) {
+                trackEvent(eventMap[modalId]);
+            }
             document.getElementById(modalId).classList.add('show');
         }
 
@@ -1707,6 +1783,7 @@
         }
 
         function openMenuModal() {
+            trackEvent('menu_opened');
             openModal('menuModal');
         }
 
