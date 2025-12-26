@@ -304,18 +304,17 @@
         }
         
         .footer {
-            height: 4vh;
+            height: 3%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #333;
             background: rgba(255,255,255,0.9);
-            font-size: clamp(8px, 1.2vh, 14px);
+            font-size: 0.9em;
             border-top: 2px solid rgba(139,69,19,0.2);
-            padding: 0 2vw;
+            padding: 0 2%;
             text-align: center;
             flex-wrap: wrap;
-            margin-top: auto;
             flex-shrink: 0;
         }
         
@@ -361,6 +360,7 @@
             margin: 5vh auto;
             display: flex;
             flex-direction: column;
+            overflow-y: auto;
         }
         .setup-screen h1 { 
             text-align: center; 
@@ -384,7 +384,7 @@
             font-size: 1.8vh;
         }
         .team-setup { 
-            margin-top: 2vh; 
+            margin-top: 0; 
             padding: 2vh; 
             background: #f8f9fa; 
             border-radius: 10px; 
@@ -418,14 +418,84 @@
             border-radius: 8px;
             font-size: 2vh; 
             width: 100%; 
-            margin-top: 2vh; 
+            margin-top: 1vh; 
             font-weight: bold; 
             cursor: pointer;
+            flex-shrink: 0;
         }
         .setup-screen button:hover { opacity: 0.9; }
         .setup-screen button:disabled { opacity: 0.5; cursor: not-allowed; }
         .hidden { display: none !important; }
         .setup-screen h1 { text-align: center; color: #333; margin-bottom: 30px; }
+        
+        /* Visual Setup */
+        .setup-step { width: 100%; }
+        .selection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3vh;
+            margin: 3vh 0;
+        }
+        .teams-grid { 
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2vh;
+        }
+        .selection-card.full-width {
+            grid-column: 1 / -1;
+        }
+        .selection-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4vh 2vw;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .teams-grid .selection-card {
+            padding: 3vh 1.5vw;
+        }
+        .selection-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.2);
+        }
+        .selection-card:active {
+            transform: translateY(-2px);
+        }
+        .card-icon {
+            font-size: 8vh;
+            margin-bottom: 2vh;
+        }
+        .teams-grid .card-icon {
+            font-size: 5vh;
+            margin-bottom: 1vh;
+        }
+        .selection-card h3 {
+            font-size: 2.5vh;
+            margin-bottom: 1vh;
+        }
+        .teams-grid .selection-card h3 {
+            font-size: 2vh;
+        }
+        .selection-card p {
+            font-size: 1.6vh;
+            opacity: 0.9;
+        }
+        .teams-grid .selection-card p {
+            font-size: 1.4vh;
+        }
+        .back-btn {
+            background: #e0e0e0;
+            color: #333;
+            padding: 1.5vh 3vw;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.8vh;
+            cursor: pointer;
+            margin-bottom: 2vh;
+        }
+        .back-btn:hover { background: #d0d0d0; }
     </style>
 </head>
 <body>
@@ -434,17 +504,46 @@
         <!-- Setup Screen -->
         <div class="setup-screen" id="setupScreen">
             <h1>Asta Chemma - అష్టా చమ్మా</h1>
-            <div class="form-group">
-                <label>Number of Teams (2-4):</label>
-                <input type="number" id="numTeams" min="2" max="4" value="2">
-            </div>
-            <div class="form-group">
-                <label>Players per Team (1-2, same for all):</label>
-                <input type="number" id="playersPerTeam" min="1" max="2" value="1">
-            </div>
-            <button onclick="generateTeamInputs()">Next</button>
             
-            <div class="team-setup hidden" id="teamSetup"></div>
+            <!-- Step 1: Players per Team -->
+            <div class="setup-step" id="step1">
+                <h2 style="text-align: center; margin-bottom: 3vh; color: #667eea;">Select Players per Team</h2>
+                <div class="selection-grid">
+                    <div class="selection-card" onclick="selectPlayersPerTeam(1)">
+                        <div class="card-icon">👤</div>
+                        <h3>Single Player</h3>
+                        <p>1 player per team</p>
+                    </div>
+                    <div class="selection-card" onclick="selectPlayersPerTeam(2)">
+                        <div class="card-icon">👥</div>
+                        <h3>Two Players</h3>
+                        <p>2 players per team</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 2: Number of Teams -->
+            <div class="setup-step hidden" id="step2">
+                <button class="back-btn" onclick="backToStep1()">← Back</button>
+                <h2 style="text-align: center; margin-bottom: 3vh; color: #667eea;">Select Number of Teams</h2>
+                <div class="selection-grid teams-grid">
+                    <div class="selection-card" onclick="selectNumTeams(2)">
+                        <div class="card-icon" style="font-size: 6vh;">🔴🔵</div>
+                        <h3>2 Teams</h3>
+                        <p>Classic match</p>
+                    </div>
+                    <div class="selection-card" onclick="selectNumTeams(3)">
+                        <div class="card-icon" style="font-size: 6vh;">🔴🔵🟢</div>
+                        <h3>3 Teams</h3>
+                        <p>Triple challenge</p>
+                    </div>
+                    <div class="selection-card full-width" onclick="selectNumTeams(4)">
+                        <div class="card-icon" style="font-size: 6vh;">🔴🔵🟢🟠</div>
+                        <h3>4 Teams</h3>
+                        <p>Maximum chaos</p>
+                    </div>
+                </div>
+            </div>
             
             <!-- Ad Space in Setup -->
             <div class="ad-container" style="margin-top: 2vh;">
@@ -454,12 +553,7 @@
                      data-ad-slot="4464556209"
                      data-ad-format="auto"
                      data-full-width-responsive="true"></ins>
-                <script>
-                     (adsbygoogle = window.adsbygoogle || []).push({});
-                </script>
             </div>
-            
-            <button class="hidden" id="startBtn" onclick="startGame()">Start Game</button>
         </div>
 
         <!-- Game Screen -->
@@ -513,9 +607,6 @@
                      data-ad-slot="2025901607"
                      data-ad-format="auto"
                      data-full-width-responsive="true"></ins>
-                <script>
-                     (adsbygoogle = window.adsbygoogle || []).push({});
-                </script>
             </div>
             
             <!-- 3% Footer -->
@@ -532,6 +623,61 @@
                 <button onclick="closeModal('menuModal'); openModal('referenceModal')" style="width: 100%; padding: 15px; margin: 10px 0; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 2vh; cursor: pointer;">📖 Reference Guide</button>
                 <button onclick="closeModal('menuModal'); openModal('historyModal')" style="width: 100%; padding: 15px; margin: 10px 0; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 2vh; cursor: pointer;">📜 Roll History</button>
                 <button onclick="closeModal('menuModal'); openModal('statusModal')" style="width: 100%; padding: 15px; margin: 10px 0; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 2vh; cursor: pointer;">👥 Team Status</button>
+                <button onclick="closeModal('menuModal'); openModal('debugModal')" style="width: 100%; padding: 15px; margin: 10px 0; background: #ff6b6b; color: white; border: none; border-radius: 8px; font-size: 2vh; cursor: pointer;">🔧 Debug Mode</button>
+                <button onclick="restartGame()" style="width: 100%; padding: 15px; margin: 10px 0; background: #e74c3c; color: white; border: none; border-radius: 8px; font-size: 2vh; cursor: pointer;">🔄 Restart Game</button>
+            </div>
+        </div>
+
+        <!-- Debug Modal -->
+        <div class="modal" id="debugModal">
+            <div class="modal-content">
+                <span class="modal-close" onclick="closeModal('debugModal')">×</span>
+                <h2>Debug Mode - Set Game State</h2>
+                
+                <div style="margin: 20px 0;">
+                    <h3>Team Origins</h3>
+                    <p style="font-size: 14px; color: #666;">Enter origin position (0=Bottom-Left(4,2), 1=Top-Right(2,4), 2=Top-Left(0,2), 3=Bottom-Right(2,0))</p>
+                    <label>Team 1 Origin: <input type="number" id="debugTeamOrigin0" min="0" max="3" value="0" style="width: 60px;"></label><br>
+                    <label>Team 2 Origin: <input type="number" id="debugTeamOrigin1" min="0" max="3" value="2" style="width: 60px;"></label><br>
+                    <label>Team 3 Origin (if 3+ teams): <input type="number" id="debugTeamOrigin2" min="0" max="3" value="1" style="width: 60px;"></label><br>
+                    <label>Team 4 Origin (if 4 teams): <input type="number" id="debugTeamOrigin3" min="0" max="3" value="3" style="width: 60px;"></label>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <h3>Current Turn</h3>
+                    <label>Current Team (1-4): <input type="number" id="debugTeamIndex" min="1" max="4" value="1" style="width: 60px;"></label><br>
+                    <label>Current Player (1-2): <input type="number" id="debugPlayerIndex" min="1" max="2" value="1" style="width: 60px;"></label><br>
+                    <label>Player has Pandatam: 
+                        <select id="debugPandatam" style="padding: 5px;">
+                            <option value="true">Yes</option>
+                            <option value="false">No</option>
+                        </select>
+                    </label><br>
+                    <label>Chemmas: <input type="number" id="debugChemmas" min="0" value="0" style="width: 60px;"></label><br>
+                    <label>Last Roll: 
+                        <select id="debugLastRoll" style="padding: 5px;">
+                            <option value="none">None</option>
+                            <option value="1">1 (Kinnu)</option>
+                            <option value="2">2 (Rendu)</option>
+                            <option value="3">3 (Mudu)</option>
+                        </select>
+                    </label>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <h3>Piece Positions</h3>
+                    <p style="font-size: 14px; color: #666;">Format: Team(1-4),PieceType,Row,Col,Dead (e.g., 1,parent,0,2,false)</p>
+                    <p style="font-size: 14px; color: #666;">PieceType: parent, child1, child2 | Row/Col: 0-4 | Dead: true/false</p>
+                    <textarea id="debugPieces" rows="10" style="width: 100%; font-family: monospace; padding: 10px;" placeholder="1,parent,0,2,false
+1,child1,0,2,false
+1,child2,0,2,false
+2,parent,4,4,false
+2,child1,3,4,false
+2,child2,4,2,false"></textarea>
+                </div>
+                
+                <button onclick="applyDebugState()" style="width: 100%; padding: 15px; background: #4CAF50; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer;">Apply State</button>
+                <button onclick="exportGameState()" style="width: 100%; padding: 15px; margin-top: 10px; background: #2196F3; color: white; border: none; border-radius: 8px; font-size: 18px; cursor: pointer;">Export Current State</button>
             </div>
         </div>
 
@@ -574,7 +720,7 @@
                 <div style="font-size: 10vh;">🏆</div>
                 <h2 id="winnerText"></h2>
                 <p style="font-size: 2vh; margin: 2vh 0;">Congratulations!</p>
-                <button onclick="location.reload()" style="padding: 15px 40px; background: #4CAF50; color: white; border: none; border-radius: 8px; font-size: 2vh; cursor: pointer;">Play Again</button>
+                <button onclick="restartGame()" style="padding: 15px 40px; background: #4CAF50; color: white; border: none; border-radius: 8px; font-size: 2vh; cursor: pointer;">Play Again</button>
             </div>
         </div>
     </div>
@@ -600,38 +746,55 @@
             '2,4': [[2,4], [1,4], [0,4], [0,3], [0,2], [0,1], [0,0], [1,0], [2,0], [3,0], [4,0], [4,1], [4,2], [4,3], [4,4], [3,4], [3,3], [3,2], [3,1], [2,1], [1,1], [1,2], [1,3], [2,3], [2,2]]
         };
 
-        function generateTeamInputs() {
-            const numTeams = parseInt(document.getElementById('numTeams').value);
-            const playersPerTeam = parseInt(document.getElementById('playersPerTeam').value);
+        let setupConfig = { playersPerTeam: null, numTeams: null };
+
+        function restartGame() {
+            // Close all modals
+            document.querySelectorAll('.modal').forEach(m => m.classList.remove('show'));
             
-            if (numTeams < 2 || numTeams > 4 || playersPerTeam < 1 || playersPerTeam > 2) {
-                alert('Invalid values! Teams: 2-4, Players: 1-2');
-                return;
-            }
+            // Reset setup config
+            setupConfig = { playersPerTeam: null, numTeams: null };
             
-            const setupDiv = document.getElementById('teamSetup');
-            setupDiv.innerHTML = '<h3>Enter Team and Player Names</h3>';
+            // Reset game state
+            gameState = {
+                teams: [], currentTeamIndex: 0, currentPlayerIndex: 0,
+                chemmasCount: 0, lastRoll: null, killedThisTurn: false,
+                moveHistory: [], initialPositions: [], selectedPieceId: null, validDestinations: [],
+                turnStartChemmas: 0, turnStartLastRoll: null, firstRollOfTurn: true,
+                killedPieces: [],
+                totalChemmasThisTurn: 0, allRollsThisTurn: [],
+                rollHistory: []
+            };
             
-            for (let i = 0; i < numTeams; i++) {
-                const teamItem = document.createElement('div');
-                teamItem.className = 'team-item';
-                teamItem.innerHTML = `
-                    <h4>Team ${i + 1}</h4>
-                    <input type="text" id="teamName${i}" placeholder="Team Name" value="Team ${i + 1}">
-                    ${Array.from({length: playersPerTeam}, (_, j) => 
-                        `<input type="text" id="player${i}_${j}" placeholder="Player ${j + 1}" value="Player ${j + 1}" style="margin-top: 10px;">`
-                    ).join('')}
-                `;
-                setupDiv.appendChild(teamItem);
-            }
+            // Hide game screen, show setup screen
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('setupScreen').classList.remove('hidden');
             
-            setupDiv.classList.remove('hidden');
-            document.getElementById('startBtn').classList.remove('hidden');
+            // Reset to step 1
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step1').classList.remove('hidden');
+        }
+
+        function selectPlayersPerTeam(count) {
+            setupConfig.playersPerTeam = count;
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('step2').classList.remove('hidden');
+        }
+
+        function backToStep1() {
+            setupConfig.playersPerTeam = null;
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step1').classList.remove('hidden');
+        }
+
+        function selectNumTeams(count) {
+            setupConfig.numTeams = count;
+            startGame();
         }
 
         function startGame() {
-            const numTeams = parseInt(document.getElementById('numTeams').value);
-            const playersPerTeam = parseInt(document.getElementById('playersPerTeam').value);
+            const numTeams = setupConfig.numTeams;
+            const playersPerTeam = setupConfig.playersPerTeam;
             
             trackEvent('game_start', {
                 num_teams: numTeams,
@@ -640,16 +803,15 @@
             
             gameState.teams = [];
             
-            // Use opposite corners for 2 teams: positions 0 and 2 (top-left and bottom-left)
+            // Use opposite corners for 2 teams: positions 0 and 2 (bottom-left and top-left)
             const selectedPositions = numTeams === 2 ? [0, 2] : numTeams === 3 ? [0, 1, 2] : [0, 1, 2, 3];
             
             for (let i = 0; i < numTeams; i++) {
-                const teamName = document.getElementById(`teamName${i}`).value || `Team ${i + 1}`;
+                const teamName = TEAM_NAMES[i];
                 const players = [];
                 
                 for (let j = 0; j < playersPerTeam; j++) {
-                    const playerName = document.getElementById(`player${i}_${j}`).value || `Player ${j + 1}`;
-                    players.push({ name: playerName, pandatam: false });
+                    players.push({ name: `Player ${j + 1}`, pandatam: false });
                 }
                 
                 const [startRow, startCol] = START_POSITIONS[selectedPositions[i]];
@@ -1245,8 +1407,12 @@
             const deadChildren = team.pieces.filter(p => p.type === 'child' && p.dead);
             const canRevive = (deadParent && gameState.chemmasCount >= 2) || (deadChildren.length > 0 && gameState.chemmasCount >= 1);
 
-            if (movablePieces.length === 0 && !canRevive) {
-                // Complete deadlock - no moves and no revivals possible
+            // FIXED: Only deadlock if we have remaining values but can't use them
+            // If all values are consumed (chemmasCount=0 and lastRoll=null), turn should end normally
+            const hasRemainingValues = gameState.chemmasCount > 0 || gameState.lastRoll !== null;
+            
+            if (movablePieces.length === 0 && !canRevive && hasRemainingValues) {
+                // Complete deadlock - no moves and no revivals possible WITH REMAINING VALUES
                 if (gameState.moveHistory.length > 0 || gameState.killedPieces.length > 0) {
                     // Try to let user undo manually first
                     const killMsg = gameState.killedPieces.length > 0 ? ` ${gameState.killedPieces.length} kill(s) will be undone!` : '';
@@ -1268,6 +1434,13 @@
                     rollbackPositions();
                     nextTurn();
                 }
+                return;
+            }
+            
+            // If no remaining values and no movable pieces, end turn normally
+            if (movablePieces.length === 0 && !canRevive && !hasRemainingValues) {
+                showMessage('All values used! Turn complete.');
+                setTimeout(() => nextTurn(), 1500);
                 return;
             }
 
@@ -1721,6 +1894,7 @@
             if (eventMap[modalId]) {
                 trackEvent(eventMap[modalId]);
             }
+            
             document.getElementById(modalId).classList.add('show');
         }
 
@@ -1786,6 +1960,163 @@
             trackEvent('menu_opened');
             openModal('menuModal');
         }
+        
+        function exportGameState() {
+            const state = {
+                teamIndex: gameState.currentTeamIndex,
+                chemmas: gameState.chemmasCount,
+                lastRoll: gameState.lastRoll ? gameState.lastRoll.value : 'none',
+                pieces: []
+            };
+            
+            gameState.teams.forEach((team, teamIdx) => {
+                team.pieces.forEach(piece => {
+                    const pieceType = piece.isParent ? 'parent' : (piece.id.endsWith('1') ? 'child1' : 'child2');
+                    const [row, col] = team.path[piece.pathIndex];
+                    state.pieces.push(`${teamIdx},${pieceType},${row},${col},${piece.dead}`);
+                });
+            });
+            
+            document.getElementById('debugTeamIndex').value = state.teamIndex;
+            document.getElementById('debugChemmas').value = state.chemmas;
+            document.getElementById('debugLastRoll').value = state.lastRoll;
+            document.getElementById('debugPieces').value = state.pieces.join('\n');
+            
+            alert('Current state exported to Debug Mode!');
+        }
+        
+        function applyDebugState() {
+            const teamIndexInput = parseInt(document.getElementById('debugTeamIndex').value);
+            const teamIndex = teamIndexInput - 1; // Convert 1-based to 0-based
+            const chemmas = parseInt(document.getElementById('debugChemmas').value);
+            const lastRollValue = document.getElementById('debugLastRoll').value;
+            const piecesText = document.getElementById('debugPieces').value;
+            
+            if (teamIndex < 0 || teamIndex >= gameState.teams.length) {
+                alert(`Invalid team number! You have ${gameState.teams.length} teams (1-${gameState.teams.length}). You entered ${teamIndexInput}.`);
+                return;
+            }
+            
+            // Apply team origins first
+            const numTeams = gameState.teams.length;
+            for (let idx = 0; idx < numTeams; idx++) {
+                const originInput = document.getElementById(`debugTeamOrigin${idx}`);
+                if (originInput && originInput.value !== '') {
+                    const posIndex = parseInt(originInput.value);
+                    const [startRow, startCol] = START_POSITIONS[posIndex];
+                    gameState.teams[idx].path = PATHS[`${startRow},${startCol}`];
+                    console.log(`Team ${idx+1} origin set to position ${posIndex}: (${startRow},${startCol})`);
+                }
+            }
+            
+            // Parse pieces
+            const pieces = piecesText.trim().split('\n').filter(line => line.trim());
+            const warnings = [];
+            
+            pieces.forEach((line, lineNum) => {
+                const [teamNum, pieceType, row, col, dead] = line.split(',').map(s => s.trim());
+                const teamIdx = parseInt(teamNum) - 1; // Convert 1-based to 0-based
+                const team = gameState.teams[teamIdx];
+                if (!team) {
+                    warnings.push(`Line ${lineNum+1}: Team ${teamNum} not found (valid: 1-${gameState.teams.length})`);
+                    return;
+                }
+                
+                let piece;
+                if (pieceType === 'parent') {
+                    piece = team.pieces.find(p => p.type === 'parent');
+                } else if (pieceType === 'child1') {
+                    piece = team.pieces.find(p => p.type === 'child' && p.id === 'C1');
+                } else if (pieceType === 'child2') {
+                    piece = team.pieces.find(p => p.type === 'child' && p.id === 'C2');
+                } else {
+                    warnings.push(`Line ${lineNum+1}: Invalid piece type '${pieceType}' (valid: parent, child1, child2)`);
+                    return;
+                }
+                
+                if (!piece) {
+                    warnings.push(`Line ${lineNum+1}: Could not find ${pieceType} for Team ${teamNum}`);
+                    return;
+                }
+                
+                // Convert row,col to pathIndex by finding position in team's path
+                const targetRow = parseInt(row);
+                const targetCol = parseInt(col);
+                const pathIndex = team.path.findIndex(([r, c]) => r === targetRow && c === targetCol);
+                
+                if (pathIndex !== -1) {
+                    piece.pathIndex = pathIndex;
+                    piece.dead = dead === 'true';
+                    console.log(`✓ Team ${teamNum} ${pieceType} at (${targetRow},${targetCol}) = pathIndex ${pathIndex}, dead=${piece.dead}`);
+                } else {
+                    warnings.push(`Line ${lineNum+1}: Position (${targetRow},${targetCol}) not in Team ${teamNum}'s path! Check team origin.`);
+                    console.log(`✗ Team ${teamNum} ${pieceType}: Position (${targetRow},${targetCol}) NOT FOUND in path`);
+                    console.log(`  Team ${teamNum} path:`, team.path);
+                    piece.pathIndex = 0;
+                    piece.dead = dead === 'true';
+                }
+            });
+            
+            if (warnings.length > 0) {
+                alert('Warnings:\n' + warnings.join('\n'));
+            }
+            
+            // Set turn state
+            gameState.currentTeamIndex = teamIndex;
+            gameState.currentPlayerIndex = parseInt(document.getElementById('debugPlayerIndex').value) - 1; // Convert 1-based to 0-based
+            gameState.chemmasCount = chemmas;
+            
+            // Set pandatam for current player
+            const currentTeam = gameState.teams[teamIndex];
+            const currentPlayer = currentTeam.players[gameState.currentPlayerIndex];
+            const hasPandatam = document.getElementById('debugPandatam').value === 'true';
+            if (currentPlayer) {
+                currentPlayer.pandatam = hasPandatam;
+            }
+            
+            if (lastRollValue !== 'none') {
+                const rollValue = parseInt(lastRollValue);
+                gameState.lastRoll = { name: rollValue, value: rollValue };
+            } else {
+                gameState.lastRoll = null;
+            }
+            
+            console.log(`Turn set to Team ${teamIndexInput}, Player ${gameState.currentPlayerIndex + 1}, Pandatam=${hasPandatam}`);
+            
+            // Reset turn start states
+            gameState.initialPositions = [];
+            gameState.teams.forEach(team => {
+                gameState.initialPositions.push({
+                    teamId: team.id,
+                    pieces: team.pieces.map(p => ({
+                        id: p.id,
+                        pathIndex: p.pathIndex,
+                        dead: p.dead
+                    }))
+                });
+            });
+            
+            gameState.turnStartChemmas = chemmas;
+            gameState.turnStartLastRoll = gameState.lastRoll;
+            gameState.moveHistory = [];
+            gameState.killedPieces = [];
+            gameState.selectedPieceId = null;
+            gameState.validDestinations = [];
+            gameState.killedThisTurn = false;
+            
+            // Render and update
+            renderPieces();
+            updateGameDisplay();
+            showTurnSummary();
+            
+            // Highlight movable pieces and show dead revival options
+            updateDeadRevivalDisplay();
+            findMovablePieces();
+            
+            closeModal('debugModal');
+            
+            alert(`Debug state applied!\n\nCurrent Turn: Team ${teamIndexInput} (${currentTeam.name})\nChemmas: ${chemmas}\nLast Roll: ${lastRollValue === 'none' ? 'None' : lastRollValue}\n\nMovable pieces are highlighted.`);
+        }
 
         function openModal(modalId) {
             document.getElementById(modalId).classList.add('show');
@@ -1834,6 +2165,20 @@
             document.getElementById('remainingCell').textContent = '-';
             document.getElementById('messageCell').textContent = '-';
         }
+
+        // Initialize AdSense ads after page load
+        window.addEventListener('load', function() {
+            if (window.adsbygoogle) {
+                const ads = document.querySelectorAll('.adsbygoogle');
+                ads.forEach(ad => {
+                    try {
+                        (adsbygoogle = window.adsbygoogle || []).push({});
+                    } catch (e) {
+                        console.log('AdSense:', e.message);
+                    }
+                });
+            }
+        });
 
     </script>
     </div>
